@@ -116,8 +116,150 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lobbyWaiting => 'Waiting for friends...';
 
   @override
-  String get lobbyStartVoting => 'Start voting';
+  String get lobbyStartVoting => 'Choose movies';
 
   @override
   String get lobbyVotingReady => 'Voting ready to start.';
+
+  @override
+  String get filtersTitle => 'Movie Filters';
+
+  @override
+  String get filtersSubtitle => 'Customise the film suggestions for tonight.';
+
+  @override
+  String get filtersGenres => 'Genres';
+
+  @override
+  String get filtersGenresHint => 'Select one or more genres';
+
+  @override
+  String get filtersYearRange => 'Release year';
+
+  @override
+  String get filtersYearFrom => 'From';
+
+  @override
+  String get filtersYearTo => 'To';
+
+  @override
+  String get filtersMaxDuration => 'Max duration';
+
+  @override
+  String filtersMaxDurationMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get filtersMaxDurationAny => 'Any duration';
+
+  @override
+  String get filtersMinRating => 'Minimum rating';
+
+  @override
+  String get filtersPlatforms => 'Streaming platforms';
+
+  @override
+  String get filtersPlatformsHint => 'Select one or more platforms';
+
+  @override
+  String get filtersReset => 'Reset filters';
+
+  @override
+  String get filtersApply => 'Load movies';
+
+  @override
+  String filtersActiveCount(int count) {
+    return '$count active filter(s)';
+  }
+
+  @override
+  String get moviesTitle => 'Movie suggestions';
+
+  @override
+  String get moviesSubtitle =>
+      'These films match your filters. Vote for your favourites!';
+
+  @override
+  String get moviesEmpty =>
+      'No films match these filters. Try broadening the criteria.';
+
+  @override
+  String get moviesLoading => 'Loading films...';
+
+  @override
+  String get moviesError => 'Could not load films.';
+
+  @override
+  String get moviesRetry => 'Try again';
+
+  @override
+  String get moviesStartVoting => 'Start voting';
+
+  @override
+  String moviesCount(int count) {
+    return '$count film(s)';
+  }
+
+  @override
+  String get movieRating => 'Rating';
+
+  @override
+  String movieDuration(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String movieYear(int year) {
+    return '$year';
+  }
+
+  @override
+  String get votingTitle => 'Vote';
+
+  @override
+  String get votingTiltRight => 'Tilt right to like';
+
+  @override
+  String get votingTiltLeft => 'Tilt left to skip';
+
+  @override
+  String votingProgress(int current, int total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get votingLike => 'Like';
+
+  @override
+  String get votingSkip => 'Skip';
+
+  @override
+  String get votingFinished => 'You\'ve voted on all films!';
+
+  @override
+  String get votingGoToResults => 'See results';
+
+  @override
+  String get votingHint => 'Tilt your phone to vote';
+
+  @override
+  String get resultsTitle => 'Results';
+
+  @override
+  String get resultsSubtitle => 'Here are tonight\'s top picks!';
+
+  @override
+  String get resultsWinner => 'Winner 🏆';
+
+  @override
+  String resultsLikes(int count) {
+    return '$count like(s)';
+  }
+
+  @override
+  String get resultsNoVotes => 'No votes yet.';
+
+  @override
+  String get resultsNewSession => 'New session';
 }

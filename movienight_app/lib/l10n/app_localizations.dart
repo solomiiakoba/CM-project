@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @lobbyStartVoting.
   ///
   /// In pt, this message translates to:
-  /// **'Começar votação'**
+  /// **'Escolher filmes'**
   String get lobbyStartVoting;
 
   /// No description provided for @lobbyVotingReady.
@@ -319,6 +319,258 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Votação pronta para começar.'**
   String get lobbyVotingReady;
+
+  /// No description provided for @filtersTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtros de filmes'**
+  String get filtersTitle;
+
+  /// No description provided for @filtersSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Personaliza as sugestões de filmes para esta noite.'**
+  String get filtersSubtitle;
+
+  /// No description provided for @filtersGenres.
+  ///
+  /// In pt, this message translates to:
+  /// **'Géneros'**
+  String get filtersGenres;
+
+  /// No description provided for @filtersGenresHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seleciona um ou mais géneros'**
+  String get filtersGenresHint;
+
+  /// No description provided for @filtersYearRange.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ano de lançamento'**
+  String get filtersYearRange;
+
+  /// No description provided for @filtersYearFrom.
+  ///
+  /// In pt, this message translates to:
+  /// **'De'**
+  String get filtersYearFrom;
+
+  /// No description provided for @filtersYearTo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Até'**
+  String get filtersYearTo;
+
+  /// No description provided for @filtersMaxDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'Duração máxima'**
+  String get filtersMaxDuration;
+
+  /// No description provided for @filtersMaxDurationMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min'**
+  String filtersMaxDurationMinutes(int minutes);
+
+  /// No description provided for @filtersMaxDurationAny.
+  ///
+  /// In pt, this message translates to:
+  /// **'Qualquer duração'**
+  String get filtersMaxDurationAny;
+
+  /// No description provided for @filtersMinRating.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliação mínima'**
+  String get filtersMinRating;
+
+  /// No description provided for @filtersPlatforms.
+  ///
+  /// In pt, this message translates to:
+  /// **'Plataformas de streaming'**
+  String get filtersPlatforms;
+
+  /// No description provided for @filtersPlatformsHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seleciona uma ou mais plataformas'**
+  String get filtersPlatformsHint;
+
+  /// No description provided for @filtersReset.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar filtros'**
+  String get filtersReset;
+
+  /// No description provided for @filtersApply.
+  ///
+  /// In pt, this message translates to:
+  /// **'Carregar filmes'**
+  String get filtersApply;
+
+  /// No description provided for @filtersActiveCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} filtro(s) ativo(s)'**
+  String filtersActiveCount(int count);
+
+  /// No description provided for @moviesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sugestões de filmes'**
+  String get moviesTitle;
+
+  /// No description provided for @moviesSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Estes filmes correspondem aos teus filtros. Vota nos teus favoritos!'**
+  String get moviesSubtitle;
+
+  /// No description provided for @moviesEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum filme corresponde a estes filtros. Tenta alargar os critérios.'**
+  String get moviesEmpty;
+
+  /// No description provided for @moviesLoading.
+  ///
+  /// In pt, this message translates to:
+  /// **'A carregar filmes...'**
+  String get moviesLoading;
+
+  /// No description provided for @moviesError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar os filmes.'**
+  String get moviesError;
+
+  /// No description provided for @moviesRetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar novamente'**
+  String get moviesRetry;
+
+  /// No description provided for @moviesStartVoting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Iniciar votação'**
+  String get moviesStartVoting;
+
+  /// No description provided for @moviesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} filme(s)'**
+  String moviesCount(int count);
+
+  /// No description provided for @movieRating.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliação'**
+  String get movieRating;
+
+  /// No description provided for @movieDuration.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min'**
+  String movieDuration(int minutes);
+
+  /// No description provided for @movieYear.
+  ///
+  /// In pt, this message translates to:
+  /// **'{year}'**
+  String movieYear(int year);
+
+  /// No description provided for @votingTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votar'**
+  String get votingTitle;
+
+  /// No description provided for @votingTiltRight.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inclina para a direita para gostar'**
+  String get votingTiltRight;
+
+  /// No description provided for @votingTiltLeft.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inclina para a esquerda para saltar'**
+  String get votingTiltLeft;
+
+  /// No description provided for @votingProgress.
+  ///
+  /// In pt, this message translates to:
+  /// **'{current} de {total}'**
+  String votingProgress(int current, int total);
+
+  /// No description provided for @votingLike.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gosto'**
+  String get votingLike;
+
+  /// No description provided for @votingSkip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Saltar'**
+  String get votingSkip;
+
+  /// No description provided for @votingFinished.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votaste em todos os filmes!'**
+  String get votingFinished;
+
+  /// No description provided for @votingGoToResults.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver resultados'**
+  String get votingGoToResults;
+
+  /// No description provided for @votingHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inclina o telemóvel para votar'**
+  String get votingHint;
+
+  /// No description provided for @resultsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resultados'**
+  String get resultsTitle;
+
+  /// No description provided for @resultsSubtitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os favoritos desta noite!'**
+  String get resultsSubtitle;
+
+  /// No description provided for @resultsWinner.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vencedor 🏆'**
+  String get resultsWinner;
+
+  /// No description provided for @resultsLikes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} gosto(s)'**
+  String resultsLikes(int count);
+
+  /// No description provided for @resultsNoVotes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem votos ainda.'**
+  String get resultsNoVotes;
+
+  /// No description provided for @resultsNewSession.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova sessão'**
+  String get resultsNewSession;
 }
 
 class _AppLocalizationsDelegate

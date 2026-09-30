@@ -34,6 +34,84 @@
   "lobbyOrganizer": "Organizador",
   "lobbyParticipant": "Participante",
   "lobbyWaiting": "Aguardando amigos...",
-  "lobbyStartVoting": "Começar votação",
-  "lobbyVotingReady": "Votação pronta para começar."
+  "lobbyStartVoting": "Escolher filmes",
+  "lobbyVotingReady": "Votação pronta para começar.",
+  "filtersTitle": "Filtros de filmes",
+  "filtersSubtitle": "Personaliza as sugestões de filmes para esta noite.",
+  "filtersGenres": "Géneros",
+  "filtersGenresHint": "Seleciona um ou mais géneros",
+  "filtersYearRange": "Ano de lançamento",
+  "filtersYearFrom": "De",
+  "filtersYearTo": "Até",
+  "filtersMaxDuration": "Duração máxima",
+  "filtersMaxDurationMinutes": "{minutes} min",
+  "@filtersMaxDurationMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "filtersMaxDurationAny": "Qualquer duração",
+  "filtersMinRating": "Avaliação mínima",
+  "filtersPlatforms": "Plataformas de streaming",
+  "filtersPlatformsHint": "Seleciona uma ou mais plataformas",
+  "filtersReset": "Limpar filtros",
+  "filtersApply": "Carregar filmes",
+  "filtersActiveCount": "{count} filtro(s) ativo(s)",
+  "@filtersActiveCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "moviesTitle": "Sugestões de filmes",
+  "moviesSubtitle": "Estes filmes correspondem aos teus filtros. Vota nos teus favoritos!",
+  "moviesEmpty": "Nenhum filme corresponde a estes filtros. Tenta alargar os critérios.",
+  "moviesLoading": "A carregar filmes...",
+  "moviesError": "Não foi possível carregar os filmes.",
+  "moviesRetry": "Tentar novamente",
+  "moviesStartVoting": "Iniciar votação",
+  "moviesCount": "{count} filme(s)",
+  "@moviesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "movieRating": "Avaliação",
+  "movieDuration": "{minutes} min",
+  "@movieDuration": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "movieYear": "{year}",
+  "@movieYear": {
+    "placeholders": {
+      "year": { "type": "int" }
+    }
+  },
+  "votingTitle": "Votar",
+  "votingTiltRight": "Inclina para a direita para gostar",
+  "votingTiltLeft": "Inclina para a esquerda para saltar",
+  "votingProgress": "{current} de {total}",
+  "@votingProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "votingLike": "Gosto",
+  "votingSkip": "Saltar",
+  "votingFinished": "Votaste em todos os filmes!",
+  "votingGoToResults": "Ver resultados",
+  "votingHint": "Inclina o telemóvel para votar",
+  "resultsTitle": "Resultados",
+  "resultsSubtitle": "Os favoritos desta noite!",
+  "resultsWinner": "Vencedor 🏆",
+  "resultsLikes": "{count} gosto(s)",
+  "@resultsLikes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "resultsNoVotes": "Sem votos ainda.",
+  "resultsNewSession": "Nova sessão"
 }

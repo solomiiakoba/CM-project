@@ -34,6 +34,84 @@
   "lobbyOrganizer": "Organizer",
   "lobbyParticipant": "Participant",
   "lobbyWaiting": "Waiting for friends...",
-  "lobbyStartVoting": "Start voting",
-  "lobbyVotingReady": "Voting ready to start."
+  "lobbyStartVoting": "Choose movies",
+  "lobbyVotingReady": "Voting ready to start.",
+  "filtersTitle": "Movie Filters",
+  "filtersSubtitle": "Customise the film suggestions for tonight.",
+  "filtersGenres": "Genres",
+  "filtersGenresHint": "Select one or more genres",
+  "filtersYearRange": "Release year",
+  "filtersYearFrom": "From",
+  "filtersYearTo": "To",
+  "filtersMaxDuration": "Max duration",
+  "filtersMaxDurationMinutes": "{minutes} min",
+  "@filtersMaxDurationMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "filtersMaxDurationAny": "Any duration",
+  "filtersMinRating": "Minimum rating",
+  "filtersPlatforms": "Streaming platforms",
+  "filtersPlatformsHint": "Select one or more platforms",
+  "filtersReset": "Reset filters",
+  "filtersApply": "Load movies",
+  "filtersActiveCount": "{count} active filter(s)",
+  "@filtersActiveCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "moviesTitle": "Movie suggestions",
+  "moviesSubtitle": "These films match your filters. Vote for your favourites!",
+  "moviesEmpty": "No films match these filters. Try broadening the criteria.",
+  "moviesLoading": "Loading films...",
+  "moviesError": "Could not load films.",
+  "moviesRetry": "Try again",
+  "moviesStartVoting": "Start voting",
+  "moviesCount": "{count} film(s)",
+  "@moviesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "movieRating": "Rating",
+  "movieDuration": "{minutes} min",
+  "@movieDuration": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "movieYear": "{year}",
+  "@movieYear": {
+    "placeholders": {
+      "year": { "type": "int" }
+    }
+  },
+  "votingTitle": "Vote",
+  "votingTiltRight": "Tilt right to like",
+  "votingTiltLeft": "Tilt left to skip",
+  "votingProgress": "{current} of {total}",
+  "@votingProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "votingLike": "Like",
+  "votingSkip": "Skip",
+  "votingFinished": "You've voted on all films!",
+  "votingGoToResults": "See results",
+  "votingHint": "Tilt your phone to vote",
+  "resultsTitle": "Results",
+  "resultsSubtitle": "Here are tonight's top picks!",
+  "resultsWinner": "Winner 🏆",
+  "resultsLikes": "{count} like(s)",
+  "@resultsLikes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "resultsNoVotes": "No votes yet.",
+  "resultsNewSession": "New session"
 }

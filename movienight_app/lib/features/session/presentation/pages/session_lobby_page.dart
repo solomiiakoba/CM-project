@@ -5,9 +5,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import 'package:movienight_app/app/theme.dart';
 import 'package:movienight_app/core/bluetooth/movie_night_peripheral_service.dart';
+import 'package:movienight_app/features/movies/presentation/pages/movie_filters_page.dart';
 import 'package:movienight_app/features/session/domain/entities/session.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
+import 'package:movienight_app/shared/widgets/particle_background.dart';
 
 class SessionLobbyPage extends StatefulWidget {
   final Session session;
@@ -18,27 +21,28 @@ class SessionLobbyPage extends StatefulWidget {
   });
 
   @override
-  State<SessionLobbyPage> createState() =>
-      _SessionLobbyPageState();
+  State<SessionLobbyPage> createState() => _SessionLobbyPageState();
 }
 
-class _SessionLobbyPageState
-    extends State<SessionLobbyPage> {
+class _SessionLobbyPageState extends State<SessionLobbyPage>
+    with SingleTickerProviderStateMixin {
   final MovieNightPeripheralService _peripheralService =
       MovieNightPeripheralService();
 
   StreamSubscription<Uint8List>? _messageSubscription;
-
+  late AnimationController _pulseController;
   late Session _session;
-
   bool _advertising = false;
-  String? _bluetoothStatus;
 
   @override
   void initState() {
     super.initState();
-
     _session = widget.session;
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
 
     _listenForBluetoothMessages();
     _startBluetoothAdvertising();
@@ -46,376 +50,556 @@ class _SessionLobbyPageState
 
   void _listenForBluetoothMessages() {
     _messageSubscription =
-        _peripheralService.receivedData.listen(
-      _handleBluetoothMessage,
-    );
+        _peripheralService.receivedData.listen(_handleBluetoothMessage);
   }
 
   void _handleBluetoothMessage(Uint8List data) {
     try {
-      final text = utf8.decode(
-        data,
-        allowMalformed: true,
-      );
-
-      debugPrint(
-        'LOBBY BLE recebido: $text',
-      );
-
+      final text = utf8.decode(data, allowMalformed: true);
       final decoded = jsonDecode(text);
-
-      if (decoded is! Map) {
-        return;
-      }
+      if (decoded is! Map) return;
 
       final type = decoded['type']?.toString();
+      if (type != 'join_session') return;
 
-      if (type != 'join_session') {
-        return;
-      }
+      final sessionId = decoded['sessionId']?.toString();
+      final participantId = decoded['participantId']?.toString();
 
-      final sessionId =
-          decoded['sessionId']?.toString();
-
-      final participantId =
-          decoded['participantId']?.toString();
-
-      debugPrint(
-        'LOBBY: join recebido '
-        'sessionId=$sessionId '
-        'sessionAtual=${_session.id} '
-        'participantId=$participantId',
-      );
-
-      if (sessionId == null ||
-          participantId == null ||
-          sessionId.isEmpty ||
-          participantId.isEmpty) {
-        return;
-      }
-
-      if (sessionId != _session.id) {
-        debugPrint(
-          'LOBBY: sessão diferente. Ignorado.',
-        );
-        return;
-      }
-
-      if (_session.participantIds
-          .contains(participantId)) {
-        debugPrint(
-          'LOBBY: participante já existe.',
-        );
-        return;
-      }
+      if (sessionId == null || participantId == null ||
+          sessionId.isEmpty || participantId.isEmpty) return;
+      if (sessionId != _session.id) return;
+      if (_session.participantIds.contains(participantId)) return;
 
       setState(() {
         _session = _session.copyWith(
-          participantIds: [
-            ..._session.participantIds,
-            participantId,
-          ],
+          participantIds: [..._session.participantIds, participantId],
         );
       });
 
-      debugPrint(
-        'LOBBY: participante adicionado: '
-        '$participantId',
-      );
-
-      if (!mounted) {
-        return;
-      }
-
-      final successMsg = AppLocalizations.of(context)!.lobbyNewParticipant;
+      if (!mounted) return;
+      final msg = AppLocalizations.of(context)!.lobbyNewParticipant;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(successMsg),
-        ),
+        SnackBar(content: Text(msg)),
       );
-    } catch (e) {
-      debugPrint(
-        'LOBBY: erro ao processar BLE: $e',
-      );
-    }
+    } catch (_) {}
   }
 
   Future<void> _startBluetoothAdvertising() async {
     try {
-      final result =
-          await _peripheralService.startAdvertising();
-
-      debugPrint(
-        'LOBBY: advertising result=$result',
-      );
-
-      if (!mounted) {
-        return;
-      }
-
-      if (result == 'granted' ||
-          result == 'ready') {
-        setState(() {
-          _advertising = true;
-          // Localized string cannot be directly used in setState here because it needs context.
-          // Will handle this in build method instead, using _advertising flag to show the text.
-        });
-      } else {
-        setState(() {
-          _advertising = false;
-        });
-      }
-    } catch (e) {
-      debugPrint(
-        'LOBBY: erro ao iniciar advertising: $e',
-      );
-
-      if (!mounted) {
-        return;
-      }
-
+      final result = await _peripheralService.startAdvertising();
+      if (!mounted) return;
       setState(() {
-        _advertising = false;
-        // Handled in build
+        _advertising = result == 'granted' || result == 'ready';
       });
+    } catch (_) {
+      if (mounted) setState(() => _advertising = false);
     }
   }
 
   Future<void> _stopBluetoothAdvertising() async {
     try {
       await _peripheralService.stopAdvertising();
-    } catch (e) {
-      debugPrint(
-        'LOBBY: erro ao parar advertising: $e',
-      );
-    }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
     _messageSubscription?.cancel();
+    _pulseController.dispose();
     _stopBluetoothAdvertising();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
     final qrData = jsonEncode({
       'type': 'session_invite',
       'sessionId': _session.id,
       'name': _session.name,
-      'createdAt':
-          _session.createdAt.toIso8601String(),
+      'createdAt': _session.createdAt.toIso8601String(),
       'organizerId': _session.organizerId,
-      'participantIds':
-          _session.participantIds,
+      'participantIds': _session.participantIds,
     });
-
-    final participantCount =
-        _session.participantIds.length + 1;
-        
-    final String currentBluetoothStatus = _advertising 
-        ? l10n.lobbyBluetoothAvailable
-        : l10n.lobbyBluetoothError; // Simplifying for this example
+    final participantCount = _session.participantIds.length + 1;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.lobbyTitle),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              Text(
-                _session.name,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+      backgroundColor: MNColors.background,
+      body: ParticleBackground(
+        particleCount: 30,
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              // ── AppBar ─────────────────────────────────────────────────
+              SliverAppBar(
+                backgroundColor: Colors.transparent,
+                pinned: false,
+                title: Text(
+                  l10n.lobbyTitle,
+                  style: const TextStyle(
+                    color: MNColors.onBackground,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_rounded,
+                      color: MNColors.onBackground),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(l10n.lobbySubtitle),
-              const SizedBox(height: 24),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _advertising
-                        ? Colors.green
-                        : Colors.orange,
-                  ),
-                  borderRadius:
-                      BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _advertising
-                          ? Icons.bluetooth
-                          : Icons.bluetooth_disabled,
-                      color: _advertising
-                          ? Colors.green
-                          : Colors.orange,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
+
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    // ── Nome da sessão ──────────────────────────────────
+                    ShaderMask(
+                      shaderCallback: (b) => const LinearGradient(
+                        colors: [MNColors.primaryLight, MNColors.secondary],
+                      ).createShader(b),
                       child: Text(
-                        currentBluetoothStatus,
+                        _session.name,
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Center(
-                child: Text(
-                  l10n.lobbySessionCode,
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  _session.id,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 3,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(16),
-                  ),
-                  child: QrImageView(
-                    data: qrData,
-                    version: QrVersions.auto,
-                    size: 220,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  borderRadius:
-                      BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.people,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            l10n.lobbyParticipants,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '$participantCount',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.lobbySubtitle,
+                      style: const TextStyle(
+                        color: MNColors.onSurfaceVar,
+                        fontSize: 14,
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    ListTile(
-                      contentPadding:
-                          EdgeInsets.zero,
-                      leading: const CircleAvatar(
-                        child: Icon(
-                          Icons.person,
-                        ),
-                      ),
-                      title: Text(l10n.lobbyYou),
-                      subtitle: Text(l10n.lobbyOrganizer),
+
+                    const SizedBox(height: 24),
+
+                    // ── Status Bluetooth ────────────────────────────────
+                    _BluetoothStatusCard(
+                      advertising: _advertising,
+                      pulseController: _pulseController,
+                      label: _advertising
+                          ? l10n.lobbyBluetoothAvailable
+                          : l10n.lobbyBluetoothError,
                     ),
-                    if (_session
-                        .participantIds
-                        .isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 8,
+
+                    const SizedBox(height: 28),
+
+                    // ── QR Code ─────────────────────────────────────────
+                    _QrCodeCard(
+                      qrData: qrData,
+                      sessionId: _session.id,
+                      sessionCodeLabel: l10n.lobbySessionCode,
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // ── Participantes ───────────────────────────────────
+                    _ParticipantsCard(
+                      session: _session,
+                      participantCount: participantCount,
+                      l10n: l10n,
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // ── Botão iniciar ───────────────────────────────────
+                    _GradientButton(
+                      icon: Icons.play_arrow_rounded,
+                      label: l10n.lobbyStartVoting,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              MovieFiltersPage(sessionId: _session.id),
                         ),
-                        child: Text(l10n.lobbyWaiting),
                       ),
-                    for (final participantId
-                        in _session
-                            .participantIds)
-                      ListTile(
-                        contentPadding:
-                            EdgeInsets.zero,
-                        leading:
-                            const CircleAvatar(
-                          child: Icon(
-                            Icons.person_outline,
-                          ),
-                        ),
-                        title: Text(l10n.lobbyParticipant),
-                        subtitle: Text(
-                          participantId,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed:
-                      _session.participantIds.isEmpty
-                          ? null
-                          : () {
-                              final readyMsg = AppLocalizations.of(context)!.lobbyVotingReady;
-                              ScaffoldMessenger
-                                  .of(context)
-                                  .showSnackBar(
-                                SnackBar(
-                                  content: Text(readyMsg),
-                                ),
-                              );
-                            },
-                  child: Text(l10n.lobbyStartVoting),
+                    ),
+                  ]),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bluetooth status card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _BluetoothStatusCard extends StatelessWidget {
+  final bool advertising;
+  final AnimationController pulseController;
+  final String label;
+
+  const _BluetoothStatusCard({
+    required this.advertising,
+    required this.pulseController,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor =
+        advertising ? MNColors.secondary : const Color(0xFFF59E0B);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: MNColors.surfaceVar,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: activeColor.withOpacity(0.4)),
+      ),
+      child: Row(
+        children: [
+          AnimatedBuilder(
+            animation: pulseController,
+            builder: (_, __) {
+              final scale = advertising
+                  ? 1.0 + pulseController.value * 0.25
+                  : 1.0;
+              return Transform.scale(
+                scale: scale,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: activeColor.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    advertising
+                        ? Icons.bluetooth_searching_rounded
+                        : Icons.bluetooth_disabled_rounded,
+                    color: activeColor,
+                    size: 20,
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: activeColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// QR Code card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _QrCodeCard extends StatelessWidget {
+  final String qrData;
+  final String sessionId;
+  final String sessionCodeLabel;
+
+  const _QrCodeCard({
+    required this.qrData,
+    required this.sessionId,
+    required this.sessionCodeLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: MNColors.surfaceVar,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: MNColors.outlineVar),
+        boxShadow: [
+          BoxShadow(
+            color: MNColors.primary.withOpacity(0.15),
+            blurRadius: 30,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // QR com fundo branco
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: QrImageView(
+              data: qrData,
+              version: QrVersions.auto,
+              size: 200,
+              backgroundColor: Colors.white,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          Text(
+            sessionCodeLabel,
+            style: const TextStyle(
+              color: MNColors.onSurfaceVar,
+              fontSize: 12,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ShaderMask(
+            shaderCallback: (b) => const LinearGradient(
+              colors: [MNColors.primaryLight, MNColors.secondary],
+            ).createShader(b),
+            child: Text(
+              sessionId,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Participantes card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ParticipantsCard extends StatelessWidget {
+  final Session session;
+  final int participantCount;
+  final AppLocalizations l10n;
+
+  const _ParticipantsCard({
+    required this.session,
+    required this.participantCount,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: MNColors.surfaceVar,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: MNColors.outlineVar),
+      ),
+      child: Column(
+        children: [
+          // Cabeçalho
+          Row(
+            children: [
+              const Icon(Icons.people_rounded,
+                  color: MNColors.primaryLight, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.lobbyParticipants,
+                  style: const TextStyle(
+                    color: MNColors.onBackground,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [MNColors.primary, MNColors.secondary],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '$participantCount',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(color: MNColors.outlineVar, height: 1),
+          const SizedBox(height: 16),
+
+          // Organizador
+          _ParticipantTile(
+            icon: Icons.star_rounded,
+            iconColor: const Color(0xFFFBBF24),
+            name: l10n.lobbyYou,
+            subtitle: l10n.lobbyOrganizer,
+          ),
+
+          if (session.participantIds.isEmpty) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const SizedBox(width: 8),
+                const Icon(Icons.hourglass_empty_rounded,
+                    size: 14, color: MNColors.onSurfaceVar),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.lobbyWaiting,
+                  style: const TextStyle(
+                    color: MNColors.onSurfaceVar,
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          for (final pid in session.participantIds) ...[
+            const SizedBox(height: 8),
+            _ParticipantTile(
+              icon: Icons.person_rounded,
+              iconColor: MNColors.primaryLight,
+              name: l10n.lobbyParticipant,
+              subtitle: pid,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ParticipantTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String name;
+  final String subtitle;
+
+  const _ParticipantTile({
+    required this.icon,
+    required this.iconColor,
+    required this.name,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.12),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: iconColor, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                  color: MNColors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: MNColors.onSurfaceVar,
+                  fontSize: 11,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Botão gradiente reutilizável
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _GradientButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _GradientButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 58,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [MNColors.primary, MNColors.secondary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: MNColors.primary.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 22),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
         ),
       ),
     );

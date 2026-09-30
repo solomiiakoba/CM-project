@@ -116,8 +116,151 @@ class AppLocalizationsPt extends AppLocalizations {
   String get lobbyWaiting => 'Aguardando amigos...';
 
   @override
-  String get lobbyStartVoting => 'Começar votação';
+  String get lobbyStartVoting => 'Escolher filmes';
 
   @override
   String get lobbyVotingReady => 'Votação pronta para começar.';
+
+  @override
+  String get filtersTitle => 'Filtros de filmes';
+
+  @override
+  String get filtersSubtitle =>
+      'Personaliza as sugestões de filmes para esta noite.';
+
+  @override
+  String get filtersGenres => 'Géneros';
+
+  @override
+  String get filtersGenresHint => 'Seleciona um ou mais géneros';
+
+  @override
+  String get filtersYearRange => 'Ano de lançamento';
+
+  @override
+  String get filtersYearFrom => 'De';
+
+  @override
+  String get filtersYearTo => 'Até';
+
+  @override
+  String get filtersMaxDuration => 'Duração máxima';
+
+  @override
+  String filtersMaxDurationMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get filtersMaxDurationAny => 'Qualquer duração';
+
+  @override
+  String get filtersMinRating => 'Avaliação mínima';
+
+  @override
+  String get filtersPlatforms => 'Plataformas de streaming';
+
+  @override
+  String get filtersPlatformsHint => 'Seleciona uma ou mais plataformas';
+
+  @override
+  String get filtersReset => 'Limpar filtros';
+
+  @override
+  String get filtersApply => 'Carregar filmes';
+
+  @override
+  String filtersActiveCount(int count) {
+    return '$count filtro(s) ativo(s)';
+  }
+
+  @override
+  String get moviesTitle => 'Sugestões de filmes';
+
+  @override
+  String get moviesSubtitle =>
+      'Estes filmes correspondem aos teus filtros. Vota nos teus favoritos!';
+
+  @override
+  String get moviesEmpty =>
+      'Nenhum filme corresponde a estes filtros. Tenta alargar os critérios.';
+
+  @override
+  String get moviesLoading => 'A carregar filmes...';
+
+  @override
+  String get moviesError => 'Não foi possível carregar os filmes.';
+
+  @override
+  String get moviesRetry => 'Tentar novamente';
+
+  @override
+  String get moviesStartVoting => 'Iniciar votação';
+
+  @override
+  String moviesCount(int count) {
+    return '$count filme(s)';
+  }
+
+  @override
+  String get movieRating => 'Avaliação';
+
+  @override
+  String movieDuration(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String movieYear(int year) {
+    return '$year';
+  }
+
+  @override
+  String get votingTitle => 'Votar';
+
+  @override
+  String get votingTiltRight => 'Inclina para a direita para gostar';
+
+  @override
+  String get votingTiltLeft => 'Inclina para a esquerda para saltar';
+
+  @override
+  String votingProgress(int current, int total) {
+    return '$current de $total';
+  }
+
+  @override
+  String get votingLike => 'Gosto';
+
+  @override
+  String get votingSkip => 'Saltar';
+
+  @override
+  String get votingFinished => 'Votaste em todos os filmes!';
+
+  @override
+  String get votingGoToResults => 'Ver resultados';
+
+  @override
+  String get votingHint => 'Inclina o telemóvel para votar';
+
+  @override
+  String get resultsTitle => 'Resultados';
+
+  @override
+  String get resultsSubtitle => 'Os favoritos desta noite!';
+
+  @override
+  String get resultsWinner => 'Vencedor 🏆';
+
+  @override
+  String resultsLikes(int count) {
+    return '$count gosto(s)';
+  }
+
+  @override
+  String get resultsNoVotes => 'Sem votos ainda.';
+
+  @override
+  String get resultsNewSession => 'Nova sessão';
 }
