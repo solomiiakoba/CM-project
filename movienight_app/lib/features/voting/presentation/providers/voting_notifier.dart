@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
+import 'package:movienight_app/core/bluetooth/movie_night_ble_client.dart';
+import 'package:movienight_app/core/bluetooth/movie_night_peripheral_service.dart';
 import 'package:movienight_app/features/movies/domain/movie.dart';
 import 'package:movienight_app/features/voting/data/voting_repository_impl.dart';
 import 'package:movienight_app/features/voting/domain/entities/vote.dart';
@@ -86,8 +88,11 @@ class VotingState {
 
 class VotingNotifier extends StateNotifier<VotingState> {
   final VotingRepository _repository;
+  final MovieNightBleClient? _bleClient;
+  final MovieNightPeripheralService? _peripheralService;
 
   StreamSubscription<AccelerometerEvent>? _accelSub;
+  StreamSubscription<Map<String, dynamic>>? _bleSub;
 
   // Limiar de inclinação para disparar um voto (m/s²).
   // O eixo X do acelerómetro: valores tipicamente entre -10 e +10.
@@ -103,8 +108,14 @@ class VotingNotifier extends StateNotifier<VotingState> {
   Timer? _confirmTimer;
   TiltGesture _pendingGesture = TiltGesture.none;
 
-  VotingNotifier(this._repository, VotingState initialState)
-      : super(initialState);
+  VotingNotifier(
+    this._repository,
+    VotingState initialState, {
+    MovieNightBleClient? bleClient,
+    MovieNightPeripheralService? peripheralService,
+  })  : _bleClient = bleClient,
+        _peripheralService = peripheralService,
+        super(initialState);
 
   // ── Inicialização ──────────────────────────────────────────────────────────
 
@@ -142,6 +153,44 @@ class VotingNotifier extends StateNotifier<VotingState> {
     );
 
     _startAccelerometer();
+    _listenForRemoteVotes();
+
+    try {
+      await _bleClient?.sendMessage({
+        'type': 'request_votes',
+        'sessionId': sessionId,
+      });
+    } catch (_) {
+      // Os votos novos continuam a ser sincronizados normalmente.
+    }
+  }
+
+  void _listenForRemoteVotes() {
+    _bleSub?.cancel();
+    _bleSub = _bleClient?.messages.listen(_handleRemoteMessage);
+  }
+
+  Future<void> _handleRemoteMessage(Map<String, dynamic> message) async {
+    if (message['type'] != 'vote_cast') return;
+    if (message['sessionId']?.toString() != state.votingSession?.sessionId) {
+      return;
+    }
+
+    final rawVote = message['vote'];
+    if (rawVote is! Map) return;
+
+    try {
+      final vote = Vote.fromJson(Map<String, dynamic>.from(rawVote));
+      final updated = await _repository.castVote(
+        sessionId: state.votingSession!.sessionId,
+        vote: vote,
+      );
+      if (!mounted) return;
+      state = state.copyWith(votingSession: updated);
+    } catch (_) {
+      // A mensagem duplicada ou recebida antes da sessão local existir
+      // não deve interromper a votação.
+    }
   }
 
   // ── Acelerómetro ──────────────────────────────────────────────────────────
@@ -211,10 +260,32 @@ class VotingNotifier extends StateNotifier<VotingState> {
     );
 
     try {
+      // O repositório recarrega a sessão antes de adicionar o voto, por isso
+      // incorpora votos recebidos dos outros dispositivos.
       final updated = await _repository.castVote(
         sessionId: state.votingSession!.sessionId,
         vote: vote,
       );
+
+      try {
+        await _bleClient?.sendMessage({
+          'type': 'vote_cast',
+          'sessionId': state.votingSession!.sessionId,
+          'vote': vote.toJson(),
+        });
+      } catch (_) {
+        // A votação local continua válida mesmo que o BLE esteja indisponível.
+      }
+
+      try {
+        await _peripheralService?.sendMessage({
+          'type': 'vote_cast',
+          'sessionId': state.votingSession!.sessionId,
+          'vote': vote.toJson(),
+        });
+      } catch (_) {
+        // O organizador continua a poder votar sem participantes ligados.
+      }
 
       await Future.delayed(const Duration(milliseconds: _cooldownMs));
 
@@ -241,6 +312,7 @@ class VotingNotifier extends StateNotifier<VotingState> {
   @override
   void dispose() {
     _accelSub?.cancel();
+    _bleSub?.cancel();
     _confirmTimer?.cancel();
     super.dispose();
   }
@@ -265,6 +337,8 @@ final votingProvider = StateNotifierProvider.family<
       movies: params.movies,
       participantId: params.participantId,
     ),
+    bleClient: params.bleClient,
+    peripheralService: params.peripheralService,
   );
   // Arranca a sessão assim que o provider é criado
   notifier.startSession(
@@ -280,11 +354,15 @@ class VotingParams {
   final String sessionId;
   final List<Movie> movies;
   final String participantId;
+  final MovieNightBleClient? bleClient;
+  final MovieNightPeripheralService? peripheralService;
 
   const VotingParams({
     required this.sessionId,
     required this.movies,
     required this.participantId,
+    this.bleClient,
+    this.peripheralService,
   });
 
   @override

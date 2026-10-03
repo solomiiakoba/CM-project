@@ -7,6 +7,9 @@ import 'bluetooth_service.dart';
 import 'movie_night_ble_client.dart';
 import '../../shared/utils/participant_identity_service.dart';
 import '../../features/session/domain/entities/session.dart';
+import '../../features/movies/domain/movie.dart';
+import '../../features/voting/presentation/pages/voting_page.dart';
+import '../../features/voting/presentation/providers/voting_notifier.dart';
 
 class BluetoothTestPage extends StatefulWidget {
   final Session? session;
@@ -75,7 +78,53 @@ class _BluetoothTestPageState
           _lastReceivedMessage =
               message.toString();
         });
+
+        _handleIncomingSessionMessage(message);
       },
+    );
+  }
+
+  void _handleIncomingSessionMessage(Map<String, dynamic> message) {
+    if (message['type'] != 'voting_started') return;
+
+    final sessionId = message['sessionId']?.toString();
+    final rawMovies = message['movies'];
+    if (sessionId == null || rawMovies is! List || rawMovies.isEmpty) return;
+
+    try {
+      final movies = rawMovies
+          .map((movie) => Movie.fromJson(
+                Map<String, dynamic>.from(movie as Map),
+              ))
+          .toList();
+
+      _openVoting(sessionId, movies);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível carregar os filmes.')),
+      );
+    }
+  }
+
+  Future<void> _openVoting(String sessionId, List<Movie> movies) async {
+    if (_participantId == null) {
+      await _loadIdentity();
+    }
+    if (!mounted || _participantId == null) return;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VotingPage(
+          params: VotingParams(
+            sessionId: sessionId,
+            movies: movies,
+            participantId: _participantId!,
+            bleClient: _bleClient,
+          ),
+        ),
+      ),
     );
   }
 

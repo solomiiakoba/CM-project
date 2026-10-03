@@ -9,9 +9,9 @@ class MovieNightPeripheralService {
 
   static const String serviceUuid = 'bf27730d-860a-4e09-889c-2d8b6a9e0fe7';
 
-  // BLE MTU típico é 20 bytes por notificação sem negociação.
-  // Usamos 180 bytes por chunk (margem segura com MTU 185).
-  static const int _chunkSize = 180;
+  // O envelope JSON acrescenta metadados e base64 ao payload. Mantemos
+  // o fragmento suficientemente pequeno para caber num MTU BLE comum.
+  static const int _chunkSize = 80;
 
   // ── Streams ──────────────────────────────────────────────────────────────
 

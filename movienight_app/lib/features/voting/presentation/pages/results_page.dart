@@ -1,30 +1,97 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'package:movienight_app/app/theme.dart';
+import 'package:movienight_app/core/bluetooth/movie_night_ble_client.dart';
+import 'package:movienight_app/core/bluetooth/movie_night_peripheral_service.dart';
 import 'package:movienight_app/features/movies/domain/movie.dart';
+import 'package:movienight_app/features/voting/domain/entities/vote.dart';
 import 'package:movienight_app/features/voting/domain/entities/voting_session.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
 import 'package:movienight_app/shared/widgets/particle_background.dart';
 
-class ResultsPage extends StatelessWidget {
+class ResultsPage extends StatefulWidget {
   final VotingSession votingSession;
   final List<Movie> movies;
+  final MovieNightBleClient? bleClient;
 
   const ResultsPage({
     super.key,
     required this.votingSession,
     required this.movies,
+    this.bleClient,
   });
+
+  @override
+  State<ResultsPage> createState() => _ResultsPageState();
+}
+
+class _ResultsPageState extends State<ResultsPage> {
+  late VotingSession _votingSession;
+  final MovieNightPeripheralService _peripheralService =
+      MovieNightPeripheralService();
+  StreamSubscription<Map<String, dynamic>>? _clientSubscription;
+  StreamSubscription<Uint8List>? _peripheralSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _votingSession = widget.votingSession;
+
+    if (widget.bleClient != null) {
+      _clientSubscription = widget.bleClient!.messages.listen(_handleMessage);
+    } else {
+      _peripheralSubscription =
+          _peripheralService.receivedData.listen(_handlePeripheralData);
+    }
+  }
+
+  void _handlePeripheralData(Uint8List data) {
+    try {
+      final decoded = jsonDecode(utf8.decode(data, allowMalformed: true));
+      if (decoded is Map) {
+        _handleMessage(Map<String, dynamic>.from(decoded));
+      }
+    } catch (_) {}
+  }
+
+  void _handleMessage(Map<String, dynamic> message) {
+    if (message['type'] != 'vote_cast' ||
+        message['sessionId']?.toString() != _votingSession.sessionId) {
+      return;
+    }
+
+    final rawVote = message['vote'];
+    if (rawVote is! Map) return;
+
+    try {
+      final vote = Vote.fromJson(Map<String, dynamic>.from(rawVote));
+      final updated = _votingSession.addVote(vote);
+      if (mounted && updated.votes.length != _votingSession.votes.length) {
+        setState(() => _votingSession = updated);
+      }
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _clientSubscription?.cancel();
+    _peripheralSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final movieMap = {for (final m in movies) m.id: m};
-    final ranked = votingSession.rankedMovieIds
+    final movieMap = {for (final m in widget.movies) m.id: m};
+    final ranked = _votingSession.rankedMovieIds
         .map((id) => movieMap[id])
         .whereType<Movie>()
         .toList();
-    final likesByMovie = votingSession.likesByMovie;
+    final likesByMovie = _votingSession.likesByMovie;
 
     return Scaffold(
       backgroundColor: MNColors.background,

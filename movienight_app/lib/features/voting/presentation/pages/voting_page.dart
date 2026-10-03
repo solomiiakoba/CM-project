@@ -27,6 +27,7 @@ class VotingPage extends ConsumerWidget {
             builder: (_) => ResultsPage(
               votingSession: state.votingSession!,
               movies: state.movies,
+              bleClient: params.bleClient,
             ),
           ),
         );
@@ -46,6 +47,7 @@ class VotingPage extends ConsumerWidget {
                     builder: (_) => ResultsPage(
                       votingSession: state.votingSession!,
                       movies: state.movies,
+                      bleClient: params.bleClient,
                     ),
                   ),
                 ),

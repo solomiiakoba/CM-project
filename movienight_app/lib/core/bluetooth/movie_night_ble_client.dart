@@ -27,6 +27,8 @@ class MovieNightBleClient {
       _messageController =
       StreamController<Map<String, dynamic>>.broadcast();
 
+  final Map<int, Map<int, List<int>>> _chunkBuffers = {};
+
   BluetoothDevice? get connectedDevice =>
       _connectedDevice;
 
@@ -236,38 +238,18 @@ class MovieNightBleClient {
     );
 
     try {
-      final text = utf8.decode(
-        data,
-        allowMalformed: true,
-      );
-
-      debugPrint(
-        'BLE texto recebido: $text',
-      );
-
+      final text = utf8.decode(data, allowMalformed: true);
       final decoded = jsonDecode(text);
 
-      if (decoded is Map<String, dynamic>) {
-        _messageController.add(decoded);
-
-        debugPrint(
-          'BLE: mensagem JSON adicionada ao stream.',
-        );
-      } else if (decoded is Map) {
-        final message =
-            Map<String, dynamic>.from(decoded);
-
-        _messageController.add(message);
-
-        debugPrint(
-          'BLE: mensagem JSON convertida '
-          'e adicionada ao stream.',
-        );
-      } else {
-        debugPrint(
-          'BLE: JSON recebido não é um Map.',
-        );
+      if (decoded is Map &&
+          decoded['_chunk'] is num &&
+          decoded['_total'] is num &&
+          decoded['_data'] is String) {
+        _handleChunk(decoded);
+        return;
       }
+
+      _emitMessage(decoded);
     } catch (e) {
       debugPrint(
         'BLE: erro ao processar mensagem: $e',
@@ -276,6 +258,37 @@ class MovieNightBleClient {
       debugPrint(
         'BLE dados recebidos: $data',
       );
+    }
+  }
+
+  void _handleChunk(Map decoded) {
+    final index = (decoded['_chunk'] as num).toInt();
+    final total = (decoded['_total'] as num).toInt();
+    if (index < 0 || total <= 0 || index >= total) return;
+
+    final buffer = _chunkBuffers.putIfAbsent(total, () => {});
+    buffer[index] = base64Decode(decoded['_data'] as String);
+    if (buffer.length != total) return;
+
+    final bytes = <int>[];
+    for (var i = 0; i < total; i++) {
+      final chunk = buffer[i];
+      if (chunk == null) return;
+      bytes.addAll(chunk);
+    }
+    _chunkBuffers.remove(total);
+
+    final decodedMessage = jsonDecode(utf8.decode(bytes, allowMalformed: true));
+    _emitMessage(decodedMessage);
+  }
+
+  void _emitMessage(dynamic decoded) {
+    if (decoded is Map<String, dynamic>) {
+      _messageController.add(decoded);
+    } else if (decoded is Map) {
+      _messageController.add(Map<String, dynamic>.from(decoded));
+    } else {
+      debugPrint('BLE: JSON recebido não é um Map.');
     }
   }
 
@@ -409,6 +422,7 @@ class MovieNightBleClient {
 
     _rxCharacteristic = null;
     _txCharacteristic = null;
+    _chunkBuffers.clear();
 
     if (_connectedDevice != null) {
       try {

@@ -6,6 +6,9 @@ import 'package:movienight_app/features/movies/presentation/providers/movies_pro
 import 'package:movienight_app/features/movies/presentation/widgets/movie_card.dart';
 import 'package:movienight_app/features/voting/presentation/pages/voting_page.dart';
 import 'package:movienight_app/features/voting/presentation/providers/voting_notifier.dart';
+import 'package:movienight_app/features/voting/data/voting_repository_impl.dart';
+import 'package:movienight_app/features/voting/domain/entities/voting_session.dart';
+import 'package:movienight_app/core/bluetooth/movie_night_peripheral_service.dart';
 import 'package:movienight_app/shared/utils/participant_identity_service.dart';
 import 'package:movienight_app/shared/widgets/particle_background.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
@@ -23,6 +26,9 @@ class MoviesListPage extends ConsumerStatefulWidget {
 }
 
 class _MoviesListPageState extends ConsumerState<MoviesListPage> {
+  final MovieNightPeripheralService _peripheralService =
+      MovieNightPeripheralService();
+  bool _startingVoting = false;
   @override
   void initState() {
     super.initState();
@@ -101,7 +107,7 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   child: GestureDetector(
-                    onTap: () => _startVoting(context),
+                    onTap: _startingVoting ? null : () => _startVoting(context),
                     child: Container(
                       width: double.infinity,
                       height: 56,
@@ -350,7 +356,36 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
   }
 
   Future<void> _startVoting(BuildContext context) async {
+    if (_startingVoting) return;
+
     final movies = ref.read(moviesProvider).movies;
+    if (movies.isEmpty) return;
+
+    setState(() => _startingVoting = true);
+
+    // Os filtros são definidos localmente, mas são enviados junto com a
+    // lista final para que todos tenham o contexto da votação.
+    try {
+      final organizerId =
+          await ParticipantIdentityService().getParticipantId();
+      await VotingRepositoryImpl().saveVotingSession(
+        VotingSession(
+          sessionId: widget.sessionId,
+          movieIds: movies.map((movie) => movie.id).toList(),
+        ),
+      );
+      await _peripheralService.sendMessage({
+        'type': 'voting_started',
+        'sessionId': widget.sessionId,
+        'organizerId': organizerId,
+        'filters': ref.read(movieFiltersProvider).toJson(),
+        'movies': movies.map((movie) => movie.toJson()).toList(),
+      });
+    } catch (_) {
+      // O organizador pode iniciar a própria votação mesmo sem participantes
+      // ligados; nesse caso não há ninguém para receber a mensagem.
+    }
+
     final participantId =
         await ParticipantIdentityService().getParticipantId();
 
@@ -360,6 +395,7 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
       sessionId: widget.sessionId,
       movies: movies,
       participantId: participantId,
+      peripheralService: _peripheralService,
     );
 
     // ignore: use_build_context_synchronously
@@ -367,5 +403,7 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
       context,
       MaterialPageRoute(builder: (_) => VotingPage(params: params)),
     );
+
+    if (mounted) setState(() => _startingVoting = false);
   }
 }

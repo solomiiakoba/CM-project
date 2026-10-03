@@ -8,6 +8,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:movienight_app/app/theme.dart';
 import 'package:movienight_app/core/bluetooth/movie_night_peripheral_service.dart';
 import 'package:movienight_app/features/movies/presentation/pages/movie_filters_page.dart';
+import 'package:movienight_app/features/voting/data/voting_repository_impl.dart';
+import 'package:movienight_app/features/voting/domain/entities/vote.dart';
 import 'package:movienight_app/features/session/domain/entities/session.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
 import 'package:movienight_app/shared/widgets/particle_background.dart';
@@ -60,6 +62,14 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
       if (decoded is! Map) return;
 
       final type = decoded['type']?.toString();
+      if (type == 'vote_cast') {
+        _handleVoteMessage(decoded);
+        return;
+      }
+      if (type == 'request_votes') {
+        _sendExistingVotes(decoded['sessionId']?.toString());
+        return;
+      }
       if (type != 'join_session') return;
 
       final sessionId = decoded['sessionId']?.toString();
@@ -82,6 +92,48 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
         SnackBar(content: Text(msg)),
       );
     } catch (_) {}
+  }
+
+  Future<void> _handleVoteMessage(Map decoded) async {
+    final sessionId = decoded['sessionId']?.toString();
+    final rawVote = decoded['vote'];
+    if (sessionId != _session.id || rawVote is! Map) return;
+
+    try {
+      final vote = Vote.fromJson(Map<String, dynamic>.from(rawVote));
+      final repository = VotingRepositoryImpl();
+      await repository.castVote(sessionId: sessionId!, vote: vote);
+
+      // Reenvia o voto para que todos os dispositivos mantenham a mesma
+      // VotingSession local. O emissor trata a mensagem como idempotente.
+      await _peripheralService.sendMessage({
+        'type': 'vote_cast',
+        'sessionId': sessionId,
+        'vote': vote.toJson(),
+      });
+    } catch (_) {
+      // Ignora votos inválidos ou recebidos antes da sessão ser inicializada.
+    }
+  }
+
+  Future<void> _sendExistingVotes(String? sessionId) async {
+    if (sessionId != _session.id) return;
+
+    try {
+      final votingSession =
+          await VotingRepositoryImpl().loadVotingSession(_session.id);
+      if (votingSession == null) return;
+
+      for (final vote in votingSession.votes) {
+        await _peripheralService.sendMessage({
+          'type': 'vote_cast',
+          'sessionId': _session.id,
+          'vote': vote.toJson(),
+        });
+      }
+    } catch (_) {
+      // O participante continuará a receber os votos novos normalmente.
+    }
   }
 
   Future<void> _startBluetoothAdvertising() async {
