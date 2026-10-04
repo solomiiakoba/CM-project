@@ -34,7 +34,7 @@ class VotingPage extends ConsumerWidget {
       });
     }
 
-    final bgColor = _backgroundFor(state.gesture);
+    final bgColor = _backgroundFor(context, state.gesture);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -57,14 +57,15 @@ class VotingPage extends ConsumerWidget {
     );
   }
 
-  Color _backgroundFor(TiltGesture gesture) {
+  Color _backgroundFor(BuildContext context, TiltGesture gesture) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     switch (gesture) {
       case TiltGesture.right:
-        return const Color(0xFF0A1F0A); // verde muito escuro
+        return isDark ? const Color(0xFF0A1F0A) : const Color(0xFFE8F5E9);
       case TiltGesture.left:
-        return const Color(0xFF1F0A0A); // vermelho muito escuro
+        return isDark ? const Color(0xFF1F0A0A) : const Color(0xFFFFEBEE);
       case TiltGesture.none:
-        return MNColors.background;
+        return Theme.of(context).scaffoldBackgroundColor;
     }
   }
 }
@@ -86,6 +87,7 @@ class _VotingView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     final movie = state.currentMovie!;
     final notifier = ref.read(votingProvider(params).notifier);
 
@@ -101,15 +103,15 @@ class _VotingView extends ConsumerWidget {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.close_rounded,
-                    color: MNColors.onSurfaceVar),
+                icon: Icon(Icons.close_rounded,
+                    color: cs.onSurface),
                 onPressed: () => Navigator.pop(context),
               ),
               Expanded(
                 child: Text(
                   l10n.votingTitle,
-                  style: const TextStyle(
-                    color: MNColors.onBackground,
+                  style: TextStyle(
+                    color: cs.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
@@ -121,14 +123,14 @@ class _VotingView extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: MNColors.surfaceVar,
+                  color: cs.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: MNColors.outlineVar),
+                  border: Border.all(color: cs.outlineVariant),
                 ),
                 child: Text(
                   '${state.progress + 1} / ${state.total}',
-                  style: const TextStyle(
-                    color: MNColors.primaryLight,
+                  style: TextStyle(
+                    color: cs.primary,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                   ),
@@ -146,8 +148,8 @@ class _VotingView extends ConsumerWidget {
             child: LinearProgressIndicator(
               value: state.total > 0 ? state.progress / state.total : 0,
               minHeight: 4,
-              backgroundColor: MNColors.outlineVar,
-              valueColor: const AlwaysStoppedAnimation(MNColors.primary),
+              backgroundColor: cs.outlineVariant,
+              valueColor: AlwaysStoppedAnimation(cs.primary),
             ),
           ),
         ),
@@ -219,8 +221,8 @@ class _VotingView extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 12),
           child: Text(
             l10n.votingHint,
-            style: const TextStyle(
-                color: MNColors.onSurfaceVar, fontSize: 11),
+            style: TextStyle(
+                color: cs.onSurfaceVariant, fontSize: 11),
           ),
         ),
       ],
@@ -240,16 +242,19 @@ class _MovieVoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: MNColors.surfaceVar,
+        color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: gesture == TiltGesture.right
               ? const Color(0xFF22C55E).withOpacity(0.6)
               : gesture == TiltGesture.left
                   ? const Color(0xFFEF4444).withOpacity(0.6)
-                  : MNColors.outlineVar,
+                  : cs.outlineVariant,
           width: gesture != TiltGesture.none ? 2 : 1,
         ),
         boxShadow: [
@@ -258,7 +263,7 @@ class _MovieVoteCard extends StatelessWidget {
                 ? const Color(0xFF22C55E).withOpacity(0.2)
                 : gesture == TiltGesture.left
                     ? const Color(0xFFEF4444).withOpacity(0.2)
-                    : MNColors.primary.withOpacity(0.15),
+                    : Colors.black.withOpacity(isDark ? 0.25 : 0.08),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -271,7 +276,7 @@ class _MovieVoteCard extends StatelessWidget {
           // Poster / placeholder
           _PosterBackground(posterPath: movie.posterPath),
 
-          // Gradiente inferior
+          // Gradiente inferior para garantir legibilidade dos detalhes
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -280,9 +285,9 @@ class _MovieVoteCard extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    MNColors.background.withOpacity(0.95),
+                    (isDark ? MNColors.background : const Color(0xFF0F172A)).withOpacity(0.92),
                   ],
-                  stops: const [0.4, 1.0],
+                  stops: const [0.35, 1.0],
                 ),
               ),
             ),
@@ -290,15 +295,15 @@ class _MovieVoteCard extends StatelessWidget {
 
           // Overlay like / skip
           if (gesture == TiltGesture.right)
-            _VoteOverlay(
+            const _VoteOverlay(
               label: '❤️  LIKE',
-              color: const Color(0xFF22C55E),
+              color: Color(0xFF22C55E),
               alignment: Alignment.topLeft,
             ),
           if (gesture == TiltGesture.left)
-            _VoteOverlay(
+            const _VoteOverlay(
               label: '✕  SKIP',
-              color: const Color(0xFFEF4444),
+              color: Color(0xFFEF4444),
               alignment: Alignment.topRight,
             ),
 
@@ -381,13 +386,13 @@ class _MovieVoteCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: MNColors.primaryContainer,
+                        color: cs.primaryContainer,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         g,
-                        style: const TextStyle(
-                          color: MNColors.onPrimaryContainer,
+                        style: TextStyle(
+                          color: cs.onPrimaryContainer,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                         ),
@@ -399,7 +404,7 @@ class _MovieVoteCard extends StatelessWidget {
                 Text(
                   movie.overview,
                   style: const TextStyle(
-                      color: Colors.white60, fontSize: 12, height: 1.4),
+                      color: Colors.white70, fontSize: 12, height: 1.4),
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -422,24 +427,21 @@ class _PosterBackground extends StatelessWidget {
       return Image.network(
         posterPath!,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _placeholder(),
+        errorBuilder: (_, __, ___) => _placeholder(context),
       );
     }
-    return _placeholder();
+    return _placeholder(context);
   }
 
-  Widget _placeholder() {
+  Widget _placeholder(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [MNColors.primaryContainer, MNColors.background],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+      decoration: BoxDecoration(
+        color: cs.primaryContainer,
       ),
-      child: const Center(
+      child: Center(
         child: Icon(Icons.movie_outlined, size: 72,
-            color: MNColors.primaryLight),
+            color: cs.onPrimaryContainer),
       ),
     );
   }
@@ -502,13 +504,16 @@ class _GestureIndicators extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final defaultColor = cs.onSurfaceVariant;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           AnimatedOpacity(
-            opacity: gesture == TiltGesture.left ? 1.0 : 0.2,
+            opacity: gesture == TiltGesture.left ? 1.0 : 0.3,
             duration: const Duration(milliseconds: 200),
             child: Row(
               children: [
@@ -516,14 +521,14 @@ class _GestureIndicators extends StatelessWidget {
                     size: 14,
                     color: gesture == TiltGesture.left
                         ? const Color(0xFFEF4444)
-                        : MNColors.onSurfaceVar),
+                        : defaultColor),
                 const SizedBox(width: 4),
                 Text(
                   l10n.votingSkip,
                   style: TextStyle(
                     color: gesture == TiltGesture.left
                         ? const Color(0xFFEF4444)
-                        : MNColors.onSurfaceVar,
+                        : defaultColor,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                   ),
@@ -532,7 +537,7 @@ class _GestureIndicators extends StatelessWidget {
             ),
           ),
           AnimatedOpacity(
-            opacity: gesture == TiltGesture.right ? 1.0 : 0.2,
+            opacity: gesture == TiltGesture.right ? 1.0 : 0.3,
             duration: const Duration(milliseconds: 200),
             child: Row(
               children: [
@@ -541,7 +546,7 @@ class _GestureIndicators extends StatelessWidget {
                   style: TextStyle(
                     color: gesture == TiltGesture.right
                         ? const Color(0xFF22C55E)
-                        : MNColors.onSurfaceVar,
+                        : defaultColor,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                   ),
@@ -551,7 +556,7 @@ class _GestureIndicators extends StatelessWidget {
                     size: 14,
                     color: gesture == TiltGesture.right
                         ? const Color(0xFF22C55E)
-                        : MNColors.onSurfaceVar),
+                        : defaultColor),
               ],
             ),
           ),
@@ -626,6 +631,8 @@ class _FinishedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -653,8 +660,8 @@ class _FinishedView extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               l10n.votingFinished,
-              style: const TextStyle(
-                color: MNColors.onBackground,
+              style: TextStyle(
+                color: cs.onSurface,
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
               ),

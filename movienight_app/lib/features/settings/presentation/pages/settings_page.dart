@@ -20,157 +20,155 @@ class SettingsPage extends ConsumerWidget {
         (themeMode == ThemeMode.system &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
-    return Scaffold(
-      backgroundColor: MNColors.background,
-      body: ParticleBackground(
-        particleCount: 20,
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              // ── Header ──────────────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+    return SafeArea(
+      child: CustomScrollView(
+        slivers: [
+          // ── Header ──────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShaderMask(
+                    shaderCallback: (b) => const LinearGradient(
+                      colors: [MNColors.primary, MNColors.secondary],
+                    ).createShader(b),
+                    child: Text(
+                      l10n.settings,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                        inherit: false,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'MovieNight',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 13,
+                      inherit: false,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Lista de opções ──────────────────────────────────────────
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // ── Secção: Aparência ──────────────────────────────────
+                _SectionLabel(label: 'Aparência'),
+                const SizedBox(height: 10),
+
+                _SettingsCard(
+                  children: [
+                    _SettingsRow(
+                      icon: isDarkMode
+                          ? Icons.dark_mode_rounded
+                          : Icons.light_mode_rounded,
+                      iconColor: isDarkMode
+                          ? MNColors.primaryLight
+                          : const Color(0xFFFBBF24),
+                      title: l10n.darkMode,
+                      subtitle: l10n.darkModeDescription,
+                      trailing: Switch(
+                        value: isDarkMode,
+                        onChanged: (v) =>
+                            ref.read(themeProvider.notifier).toggleTheme(v),
+                        activeColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // ── Secção: Idioma ─────────────────────────────────────
+                _SectionLabel(label: l10n.language),
+                const SizedBox(height: 10),
+
+                _SettingsCard(
+                  children: [
+                    _SettingsRow(
+                      icon: Icons.language_rounded,
+                      iconColor: MNColors.secondary,
+                      title: l10n.language,
+                      subtitle: l10n.languageDescription,
+                      trailing: _LanguagePicker(
+                        value: locale.languageCode,
+                        onChanged: (code) => ref
+                            .read(localeProvider.notifier)
+                            .setLocale(Locale(code!)),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // ── Secção: Acerca ─────────────────────────────────────
+                _SectionLabel(label: l10n.aboutTitle),
+                const SizedBox(height: 10),
+
+                _SettingsCard(
+                  children: [
+                    _SettingsRow(
+                      icon: Icons.info_outline_rounded,
+                      iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                      title: l10n.aboutTitle,
+                      subtitle: l10n.aboutVersion,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+
+                // ── Rodapé ─────────────────────────────────────────────
+                Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ShaderMask(
                         shaderCallback: (b) => const LinearGradient(
-                          colors: [MNColors.primaryLight, MNColors.secondary],
+                          colors: [
+                            MNColors.primary,
+                            MNColors.secondary
+                          ],
                         ).createShader(b),
-                        child: Text(
-                          l10n.settings,
-                          style: const TextStyle(
+                        child: const Text(
+                          'MovieNight 🎬',
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            inherit: false,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'MovieNight',
+                      const SizedBox(height: 4),
+                      Text(
+                        'Made with ❤️  in Flutter',
                         style: TextStyle(
-                          color: MNColors.onSurfaceVar,
-                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 11,
+                          inherit: false,
                         ),
                       ),
-                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
-              ),
-
-              // ── Lista de opções ──────────────────────────────────────────
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    // ── Secção: Aparência ──────────────────────────────────
-                    _SectionLabel(label: 'Aparência'),
-                    const SizedBox(height: 10),
-
-                    _SettingsCard(
-                      children: [
-                        _SettingsRow(
-                          icon: isDarkMode
-                              ? Icons.dark_mode_rounded
-                              : Icons.light_mode_rounded,
-                          iconColor: isDarkMode
-                              ? MNColors.primaryLight
-                              : const Color(0xFFFBBF24),
-                          title: l10n.darkMode,
-                          subtitle: l10n.darkModeDescription,
-                          trailing: Switch(
-                            value: isDarkMode,
-                            onChanged: (v) =>
-                                ref.read(themeProvider.notifier).toggleTheme(v),
-                            activeColor: MNColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // ── Secção: Idioma ─────────────────────────────────────
-                    _SectionLabel(label: l10n.language),
-                    const SizedBox(height: 10),
-
-                    _SettingsCard(
-                      children: [
-                        _SettingsRow(
-                          icon: Icons.language_rounded,
-                          iconColor: MNColors.secondary,
-                          title: l10n.language,
-                          subtitle: l10n.languageDescription,
-                          trailing: _LanguagePicker(
-                            value: locale.languageCode,
-                            onChanged: (code) => ref
-                                .read(localeProvider.notifier)
-                                .setLocale(Locale(code!)),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // ── Secção: Acerca ─────────────────────────────────────
-                    _SectionLabel(label: l10n.aboutTitle),
-                    const SizedBox(height: 10),
-
-                    _SettingsCard(
-                      children: [
-                        _SettingsRow(
-                          icon: Icons.info_outline_rounded,
-                          iconColor: MNColors.onSurfaceVar,
-                          title: l10n.aboutTitle,
-                          subtitle: l10n.aboutVersion,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // ── Rodapé ─────────────────────────────────────────────
-                    Center(
-                      child: Column(
-                        children: [
-                          ShaderMask(
-                            shaderCallback: (b) => const LinearGradient(
-                              colors: [
-                                MNColors.primary,
-                                MNColors.secondary
-                              ],
-                            ).createShader(b),
-                            child: const Text(
-                              'MovieNight 🎬',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Made with ❤️  in Flutter',
-                            style: TextStyle(
-                              color: MNColors.onSurfaceVar,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]),
-                ),
-              ),
-            ],
+              ]),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -190,8 +188,8 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         label.toUpperCase(),
-        style: const TextStyle(
-          color: MNColors.onSurfaceVar,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.5,
@@ -209,15 +207,15 @@ class _SettingsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: MNColors.surfaceVar,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: MNColors.outlineVar),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Column(
         children: List.generate(children.length * 2 - 1, (i) {
           if (i.isOdd) {
-            return const Divider(
-                height: 1, color: MNColors.outlineVar, indent: 58);
+            return Divider(
+                height: 1, color: Theme.of(context).colorScheme.outlineVariant, indent: 58);
           }
           return children[i ~/ 2];
         }),
@@ -263,16 +261,16 @@ class _SettingsRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: MNColors.onSurface,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: MNColors.onSurfaceVar,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12,
                   ),
                 ),
@@ -297,7 +295,7 @@ class _LanguagePicker extends StatelessWidget {
     return DropdownButtonHideUnderline(
       child: DropdownButton<String>(
         value: value,
-        dropdownColor: MNColors.surfaceVar,
+        dropdownColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         style: const TextStyle(
           color: MNColors.primaryLight,
           fontWeight: FontWeight.w600,

@@ -5,6 +5,7 @@ import 'package:movienight_app/l10n/app_localizations.dart';
 import 'app.dart';
 import 'theme.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
+import '../shared/widgets/particle_background.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -26,10 +27,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: MNColors.background,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: ParticleBackground(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
       ),
       // extendBody removido — evita overflow por baixo da nav bar
       bottomNavigationBar: _GlassNavBar(
@@ -85,9 +88,9 @@ class _GlassNavBar extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
-            color: MNColors.surface.withOpacity(0.85),
-            border: const Border(
-              top: BorderSide(color: MNColors.outlineVar, width: 1),
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.85),
+            border: Border(
+              top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
             ),
           ),
           child: SafeArea(
@@ -149,13 +152,13 @@ class _NavItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               decoration: BoxDecoration(
                 color: selected
-                    ? MNColors.primaryContainer.withOpacity(0.8)
+                    ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.8)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 selected ? activeIcon : icon,
-                color: selected ? MNColors.primaryLight : MNColors.onSurfaceVar,
+                color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
                 size: 22,
               ),
             ),
@@ -167,8 +170,8 @@ class _NavItem extends StatelessWidget {
                 fontWeight:
                     selected ? FontWeight.w700 : FontWeight.w500,
                 color: selected
-                    ? MNColors.primaryLight
-                    : MNColors.onSurfaceVar,
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],

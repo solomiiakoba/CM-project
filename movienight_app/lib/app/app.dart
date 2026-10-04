@@ -24,6 +24,9 @@ class MovieNightApp extends ConsumerWidget {
     return MaterialApp(
       title: 'MovieNight',
       debugShowCheckedModeBanner: false,
+      // Disable animated theme transitions — prevents TextStyle lerp crashes
+      // when switching between light and dark themes (inherit mismatch).
+      themeAnimationDuration: Duration.zero,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -54,78 +57,73 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      backgroundColor: MNColors.background,
-      body: ParticleBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 56),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 56),
 
-                // ── Logo / título ─────────────────────────────────────────
-                _LogoHeader(l10n: l10n),
+            // ── Logo / título ─────────────────────────────────────────
+            _LogoHeader(l10n: l10n),
 
-                const Spacer(),
+            const Spacer(),
 
-                // ── Botão principal: Criar sessão ─────────────────────────
-                _PrimaryActionButton(
-                  icon: Icons.add_circle_outline_rounded,
-                  label: l10n.newSession,
-                  gradient: const LinearGradient(
-                    colors: [MNColors.primary, MNColors.primaryDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    _fadeRoute(const CreateSessionPage()),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // ── Botão secundário: Entrar na sessão ────────────────────
-                _PrimaryActionButton(
-                  icon: Icons.qr_code_scanner_rounded,
-                  label: l10n.joinSession,
-                  gradient: const LinearGradient(
-                    colors: [MNColors.secondary, MNColors.secondaryDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    _fadeRoute(const ScanSessionPage()),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // ── Link discreto de teste BT ─────────────────────────────
-                Center(
-                  child: TextButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      _fadeRoute(const BluetoothPeripheralTestPage()),
-                    ),
-                    icon: const Icon(Icons.bluetooth, size: 16),
-                    label: Text(
-                      l10n.bluetoothPeripheral,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    style: TextButton.styleFrom(
-                      foregroundColor: MNColors.onSurfaceVar,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-              ],
+            // ── Botão principal: Criar sessão ─────────────────────────
+            _PrimaryActionButton(
+              icon: Icons.add_circle_outline_rounded,
+              label: l10n.newSession,
+              gradient: const LinearGradient(
+                colors: [MNColors.primary, MNColors.primaryDark],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              onTap: () => Navigator.push(
+                context,
+                _fadeRoute(const CreateSessionPage()),
+              ),
             ),
-          ),
+
+            const SizedBox(height: 16),
+
+            // ── Botão secundário: Entrar na sessão ────────────────────
+            _PrimaryActionButton(
+              icon: Icons.qr_code_scanner_rounded,
+              label: l10n.joinSession,
+              gradient: const LinearGradient(
+                colors: [MNColors.secondary, MNColors.secondaryDark],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              onTap: () => Navigator.push(
+                context,
+                _fadeRoute(const ScanSessionPage()),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // ── Link discreto de teste BT ─────────────────────────────
+            Center(
+              child: TextButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  _fadeRoute(const BluetoothPeripheralTestPage()),
+                ),
+                icon: const Icon(Icons.bluetooth, size: 16),
+                label: Text(
+                  l10n.bluetoothPeripheral,
+                  style: const TextStyle(fontSize: 12),
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );
@@ -203,8 +201,8 @@ class _LogoHeader extends StatelessWidget {
 
         Text(
           l10n.appDescription,
-          style: const TextStyle(
-            color: MNColors.onSurfaceVar,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 15,
             height: 1.5,
           ),

@@ -64,10 +64,180 @@ class MNColors {
 class MovieNightTheme {
   MovieNightTheme._();
 
-  // O app corre sempre em modo escuro com este tema,
-  // mas mantemos o getter `light` para compatibilidade (aponta para dark).
-  static ThemeData get light => dark;
+  // ── LIGHT ──────────────────────────────────────────────────────────────────
+  static final ThemeData light = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
 
+    colorScheme: const ColorScheme(
+      brightness: Brightness.light,
+
+      primary:            MNColors.primary,
+      onPrimary:          MNColors.onPrimary,
+      primaryContainer:   Color(0xFFEDE9FE), // violet-100
+      onPrimaryContainer: MNColors.primaryDark,
+
+      secondary:            MNColors.secondaryDark,
+      onSecondary:          MNColors.onSecondary,
+      secondaryContainer:   Color(0xFFCFFAFE), // cyan-100
+      onSecondaryContainer: MNColors.secondaryDark,
+
+      tertiary:   Color(0xFFF472B6), // pink-400
+      onTertiary: Color(0xFFFFFFFF),
+
+      error:   MNColors.error,
+      onError: MNColors.onError,
+
+      surface:                 Color(0xFFF8FAFC), // slate-50
+      onSurface:               Color(0xFF0F172A), // slate-900
+      surfaceContainerHighest: Color(0xFFE2E8F0), // slate-200
+      onSurfaceVariant:        Color(0xFF475569), // slate-600
+
+      outline:        Color(0xFFCBD5E1), // slate-300
+      outlineVariant: Color(0xFFE2E8F0), // slate-200
+
+      shadow:          Color(0xFF000000),
+      scrim:           Color(0xFF000000),
+      inverseSurface:  Color(0xFF0F172A),
+      onInverseSurface:Color(0xFFF8FAFC),
+      inversePrimary:  MNColors.primaryLight,
+      surfaceTint:     MNColors.primary,
+    ),
+
+    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: Color(0xFF0F172A),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: false,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF0F172A),
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.2,
+      ),
+      iconTheme: IconThemeData(color: Color(0xFF0F172A)),
+    ),
+
+    cardTheme: CardThemeData(
+      color: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+    ),
+
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) return const Color(0xFFE2E8F0);
+          return MNColors.primary;
+        }),
+        foregroundColor: WidgetStateProperty.all(MNColors.onPrimary),
+        overlayColor: WidgetStateProperty.all(MNColors.primaryLight.withOpacity(0.12)),
+        elevation: WidgetStateProperty.all(0),
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        ),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        textStyle: WidgetStateProperty.all(
+          const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 0.3),
+        ),
+      ),
+    ),
+
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: ButtonStyle(
+        foregroundColor: WidgetStateProperty.all(MNColors.primaryDark),
+        side: WidgetStateProperty.all(
+          const BorderSide(color: MNColors.primary, width: 1.5),
+        ),
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        ),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        textStyle: WidgetStateProperty.all(
+          const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+      ),
+    ),
+
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: MNColors.primary, width: 2),
+      ),
+      labelStyle: const TextStyle(color: Color(0xFF475569)),
+      hintStyle: const TextStyle(color: Color(0xFF475569), fontSize: 14),
+    ),
+
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: Colors.white,
+      indicatorColor: const Color(0xFFEDE9FE),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const IconThemeData(color: MNColors.primaryDark, size: 24);
+        }
+        return const IconThemeData(color: Color(0xFF64748B), size: 24);
+      }),
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const TextStyle(
+            color: MNColors.primaryDark,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+          );
+        }
+        return const TextStyle(
+          color: Color(0xFF64748B),
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        );
+      }),
+      elevation: 0,
+    ),
+
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
+
+    listTileTheme: const ListTileThemeData(
+      tileColor: Colors.transparent,
+      iconColor: MNColors.primaryDark,
+      textColor: Color(0xFF0F172A),
+    ),
+
+    iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
+  );
+
+  // ── DARK ───────────────────────────────────────────────────────────────────
   static final ThemeData dark = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
@@ -75,42 +245,40 @@ class MovieNightTheme {
     colorScheme: const ColorScheme(
       brightness: Brightness.dark,
 
-      primary:           MNColors.primary,
-      onPrimary:         MNColors.onPrimary,
-      primaryContainer:  MNColors.primaryContainer,
-      onPrimaryContainer:MNColors.onPrimaryContainer,
+      primary:            MNColors.primary,
+      onPrimary:          MNColors.onPrimary,
+      primaryContainer:   MNColors.primaryContainer,
+      onPrimaryContainer: MNColors.onPrimaryContainer,
 
-      secondary:           MNColors.secondary,
-      onSecondary:         MNColors.onSecondary,
-      secondaryContainer:  MNColors.secondaryContainer,
-      onSecondaryContainer:MNColors.onSecondaryContainer,
+      secondary:            MNColors.secondary,
+      onSecondary:          MNColors.onSecondary,
+      secondaryContainer:   MNColors.secondaryContainer,
+      onSecondaryContainer: MNColors.onSecondaryContainer,
 
-      tertiary:    Color(0xFFF472B6), // pink-400
-      onTertiary:  Color(0xFF1A0020),
+      tertiary:   Color(0xFFF472B6), // pink-400
+      onTertiary: Color(0xFF1A0020),
 
       error:   MNColors.error,
       onError: MNColors.onError,
 
-      surface:          MNColors.surface,
-      onSurface:        MNColors.onSurface,
+      surface:                 MNColors.surface,
+      onSurface:               MNColors.onSurface,
       surfaceContainerHighest: MNColors.surfaceVar,
-      onSurfaceVariant: MNColors.onSurfaceVar,
+      onSurfaceVariant:        MNColors.onSurfaceVar,
 
       outline:        MNColors.outline,
       outlineVariant: MNColors.outlineVar,
 
-      shadow:         Color(0xFF000000),
-      scrim:          Color(0xFF000000),
-      inverseSurface:       Color(0xFFEDE9FE),
-      onInverseSurface:     Color(0xFF1A0E2E),
-      inversePrimary:       MNColors.primaryDark,
-      surfaceTint:          MNColors.primary,
+      shadow:          Color(0xFF000000),
+      scrim:           Color(0xFF000000),
+      inverseSurface:  Color(0xFFEDE9FE),
+      onInverseSurface:Color(0xFF1A0E2E),
+      inversePrimary:  MNColors.primaryDark,
+      surfaceTint:     MNColors.primary,
     ),
 
-    // ── Scaffold / fundos ──────────────────────────────────────────────────
     scaffoldBackgroundColor: MNColors.background,
 
-    // ── AppBar ─────────────────────────────────────────────────────────────
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       foregroundColor: MNColors.onBackground,
@@ -131,33 +299,24 @@ class MovieNightTheme {
       iconTheme: IconThemeData(color: MNColors.onBackground),
     ),
 
-    // ── Cards ──────────────────────────────────────────────────────────────
     cardTheme: CardThemeData(
       color: MNColors.surfaceVar,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: MNColors.outlineVar,
-          width: 1,
-        ),
+        side: const BorderSide(color: MNColors.outlineVar, width: 1),
       ),
       margin: const EdgeInsets.symmetric(vertical: 4),
     ),
 
-    // ── Elevated button ────────────────────────────────────────────────────
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.disabled)) {
-            return MNColors.outlineVar;
-          }
+          if (states.contains(WidgetState.disabled)) return MNColors.outlineVar;
           return MNColors.primary;
         }),
         foregroundColor: WidgetStateProperty.all(MNColors.onPrimary),
-        overlayColor: WidgetStateProperty.all(
-          MNColors.primaryLight.withOpacity(0.12),
-        ),
+        overlayColor: WidgetStateProperty.all(MNColors.primaryLight.withOpacity(0.12)),
         elevation: WidgetStateProperty.all(0),
         padding: WidgetStateProperty.all(
           const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -166,16 +325,11 @@ class MovieNightTheme {
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
         textStyle: WidgetStateProperty.all(
-          const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 15,
-            letterSpacing: 0.3,
-          ),
+          const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 0.3),
         ),
       ),
     ),
 
-    // ── Outlined button ────────────────────────────────────────────────────
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
         foregroundColor: WidgetStateProperty.all(MNColors.primaryLight),
@@ -194,7 +348,6 @@ class MovieNightTheme {
       ),
     ),
 
-    // ── Text button ────────────────────────────────────────────────────────
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
         foregroundColor: WidgetStateProperty.all(MNColors.primaryLight),
@@ -204,12 +357,10 @@ class MovieNightTheme {
       ),
     ),
 
-    // ── Input / TextField ──────────────────────────────────────────────────
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: MNColors.surfaceVar,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: MNColors.outlineVar),
@@ -223,11 +374,9 @@ class MovieNightTheme {
         borderSide: const BorderSide(color: MNColors.primary, width: 2),
       ),
       labelStyle: const TextStyle(color: MNColors.onSurfaceVar),
-      hintStyle:
-          const TextStyle(color: MNColors.onSurfaceVar, fontSize: 14),
+      hintStyle: const TextStyle(color: MNColors.onSurfaceVar, fontSize: 14),
     ),
 
-    // ── NavigationBar ──────────────────────────────────────────────────────
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: MNColors.surface,
       indicatorColor: MNColors.primaryContainer,
@@ -254,7 +403,6 @@ class MovieNightTheme {
       elevation: 0,
     ),
 
-    // ── Chip ───────────────────────────────────────────────────────────────
     chipTheme: ChipThemeData(
       backgroundColor: MNColors.surfaceVar,
       selectedColor: MNColors.primaryContainer,
@@ -268,7 +416,6 @@ class MovieNightTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
 
-    // ── Slider ─────────────────────────────────────────────────────────────
     sliderTheme: const SliderThemeData(
       activeTrackColor: MNColors.primary,
       inactiveTrackColor: MNColors.outlineVar,
@@ -278,32 +425,24 @@ class MovieNightTheme {
       valueIndicatorTextStyle: TextStyle(color: Colors.white),
     ),
 
-    // ── Divider ────────────────────────────────────────────────────────────
     dividerTheme: const DividerThemeData(
       color: MNColors.outlineVar,
       thickness: 1,
       space: 1,
     ),
 
-    // ── Switch ─────────────────────────────────────────────────────────────
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) =>
-          states.contains(WidgetState.selected)
-              ? MNColors.primary
-              : MNColors.onSurfaceVar),
+          states.contains(WidgetState.selected) ? MNColors.primary : MNColors.onSurfaceVar),
       trackColor: WidgetStateProperty.resolveWith((states) =>
-          states.contains(WidgetState.selected)
-              ? MNColors.primaryContainer
-              : MNColors.outlineVar),
+          states.contains(WidgetState.selected) ? MNColors.primaryContainer : MNColors.outlineVar),
     ),
 
-    // ── Progress indicator ─────────────────────────────────────────────────
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: MNColors.primary,
       linearTrackColor: MNColors.outlineVar,
     ),
 
-    // ── SnackBar ───────────────────────────────────────────────────────────
     snackBarTheme: SnackBarThemeData(
       backgroundColor: MNColors.surfaceVar,
       contentTextStyle: const TextStyle(color: MNColors.onSurface),
@@ -311,7 +450,6 @@ class MovieNightTheme {
       behavior: SnackBarBehavior.floating,
     ),
 
-    // ── Bottom sheet ───────────────────────────────────────────────────────
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: MNColors.surface,
       shape: RoundedRectangleBorder(
@@ -319,63 +457,12 @@ class MovieNightTheme {
       ),
     ),
 
-    // ── ListTile ───────────────────────────────────────────────────────────
     listTileTheme: const ListTileThemeData(
       tileColor: Colors.transparent,
       iconColor: MNColors.primaryLight,
       textColor: MNColors.onSurface,
     ),
 
-    // ── Icon ───────────────────────────────────────────────────────────────
     iconTheme: const IconThemeData(color: MNColors.onSurface),
-
-    // ── Tipografia ─────────────────────────────────────────────────────────
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w800,
-      ),
-      displayMedium: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w700,
-      ),
-      displaySmall: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w700,
-      ),
-      headlineLarge: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w700,
-      ),
-      headlineMedium: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w700,
-      ),
-      headlineSmall: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w700,
-      ),
-      titleLarge: TextStyle(
-        color: MNColors.onBackground,
-        fontWeight: FontWeight.w700,
-      ),
-      titleMedium: TextStyle(
-        color: MNColors.onSurface,
-        fontWeight: FontWeight.w600,
-      ),
-      titleSmall: TextStyle(
-        color: MNColors.onSurface,
-        fontWeight: FontWeight.w600,
-      ),
-      bodyLarge: TextStyle(color: MNColors.onSurface),
-      bodyMedium: TextStyle(color: MNColors.onSurface),
-      bodySmall: TextStyle(color: MNColors.onSurfaceVar),
-      labelLarge: TextStyle(
-        color: MNColors.onSurface,
-        fontWeight: FontWeight.w600,
-      ),
-      labelMedium: TextStyle(color: MNColors.onSurfaceVar),
-      labelSmall: TextStyle(color: MNColors.onSurfaceVar, fontSize: 10),
-    ),
   );
 }

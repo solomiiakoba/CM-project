@@ -49,9 +49,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
   late List<_Particle> _particles;
   final Random _rng = Random();
 
-  // Gradiente de fundo — roxo/azul profundo
-  static const _bgTopColor    = Color(0xFF0D0B1E); // quase preto violeta
-  static const _bgBottomColor = Color(0xFF0A1628); // azul petróleo profundo
+  // Cores foram movidas para o build method e pro painter
 
   @override
   void initState() {
@@ -84,14 +82,19 @@ class _ParticleBackgroundState extends State<ParticleBackground>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    final bgTopColor = isDark ? const Color(0xFF0D0B1E) : const Color(0xFFE2E8F0);
+    final bgBottomColor = isDark ? const Color(0xFF0A1628) : const Color(0xFFFFFFFF);
+
     return Stack(
       fit: StackFit.expand,
       children: [
         // Gradiente de fundo
-        const DecoratedBox(
+        DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [_bgTopColor, _bgBottomColor],
+              colors: [bgTopColor, bgBottomColor],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -127,6 +130,7 @@ class _ParticleBackgroundState extends State<ParticleBackground>
               painter: _ParticlePainter(
                 particles: _particles,
                 time: _controller.value,
+                isDark: isDark,
               ),
             );
           },
@@ -146,9 +150,10 @@ class _ParticleBackgroundState extends State<ParticleBackground>
 class _ParticlePainter extends CustomPainter {
   final List<_Particle> particles;
   final double time;
+  final bool isDark;
 
-  // Cores das partículas (lilás / ciano / branco)
-  static const _colors = [
+  // Cores das partículas para dark mode
+  static const _colorsDark = [
     Color(0xFFB388FF), // violeta claro
     Color(0xFF80DEEA), // ciano
     Color(0xFFFFFFFF), // branco
@@ -156,7 +161,16 @@ class _ParticlePainter extends CustomPainter {
     Color(0xFF40C4FF), // azul céu
   ];
 
-  _ParticlePainter({required this.particles, required this.time});
+  // Cores das partículas para light mode
+  static const _colorsLight = [
+    Color(0xFF8B5CF6), // primary
+    Color(0xFF06B6D4), // secondary
+    Color(0xFF6D28D9), // primaryDark
+    Color(0xFF0891B2), // secondaryDark
+    Color(0xFF4C1D95), // very dark purple
+  ];
+
+  _ParticlePainter({required this.particles, required this.time, required this.isDark});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -167,8 +181,9 @@ class _ParticlePainter extends CustomPainter {
       final pulse = (sin(time * 2 * pi * 0.5 + p.pulsePhase) * 0.25 + 0.75)
           .clamp(0.0, 1.0);
 
-      final color = _colors[
-        (p.x * 100 + p.y * 37).toInt().abs() % _colors.length
+      final colors = isDark ? _colorsDark : _colorsLight;
+      final color = colors[
+        (p.x * 100 + p.y * 37).toInt().abs() % colors.length
       ];
 
       paint.color = color.withOpacity(p.opacity * pulse);

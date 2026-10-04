@@ -99,32 +99,34 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final genresAsync = ref.watch(availableGenresProvider);
     final platformsAsync = ref.watch(availablePlatformsProvider);
     final activeCount = _activeFilterCount;
 
     return Scaffold(
-      backgroundColor: MNColors.background,
+      backgroundColor: Colors.transparent,
       body: ParticleBackground(
         particleCount: 25,
         child: SafeArea(
           child: Column(
             children: [
-              // ── AppBar ──────────────────────────────────────────────────
+              // ── AppBar ────────────────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_rounded,
-                          color: MNColors.onBackground),
+                      icon: Icon(Icons.arrow_back_ios_rounded,
+                          color: cs.onSurface),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
                       child: Text(
                         l10n.filtersTitle,
-                        style: const TextStyle(
-                          color: MNColors.onBackground,
+                        style: TextStyle(
+                          color: cs.onSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                         ),
@@ -141,16 +143,15 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                 ),
               ),
 
-              // ── Conteúdo scrollável ──────────────────────────────────────
+              // ── Scrollable content ────────────────────────────────────────
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
                   children: [
-                    // Subtítulo + badge de filtros ativos
                     Text(
                       l10n.filtersSubtitle,
-                      style: const TextStyle(
-                        color: MNColors.onSurfaceVar,
+                      style: TextStyle(
+                        color: cs.onSurfaceVariant,
                         fontSize: 13,
                         height: 1.5,
                       ),
@@ -163,7 +164,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
 
                     const SizedBox(height: 28),
 
-                    // ── Géneros ──────────────────────────────────────────
+                    // ── Genres ────────────────────────────────────────────
                     _SectionHeader(title: l10n.filtersGenres),
                     const SizedBox(height: 10),
                     genresAsync.when(
@@ -179,6 +180,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                           return _FilterChip(
                             label: genre,
                             selected: sel,
+                            isDark: isDark,
                             onTap: () => setState(() => sel
                                 ? _selectedGenres.remove(genre)
                                 : _selectedGenres.add(genre)),
@@ -189,7 +191,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
 
                     const SizedBox(height: 28),
 
-                    // ── Ano ──────────────────────────────────────────────
+                    // ── Year range ────────────────────────────────────────
                     _SectionHeader(title: l10n.filtersYearRange),
                     const SizedBox(height: 10),
                     Row(
@@ -198,8 +200,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                           child: TextField(
                             controller: _minYearController,
                             keyboardType: TextInputType.number,
-                            style:
-                                const TextStyle(color: MNColors.onSurface),
+                            style: TextStyle(color: cs.onSurface),
                             decoration: InputDecoration(
                               labelText: l10n.filtersYearFrom,
                               isDense: true,
@@ -213,8 +214,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                           child: TextField(
                             controller: _maxYearController,
                             keyboardType: TextInputType.number,
-                            style:
-                                const TextStyle(color: MNColors.onSurface),
+                            style: TextStyle(color: cs.onSurface),
                             decoration: InputDecoration(
                               labelText: l10n.filtersYearTo,
                               isDense: true,
@@ -228,7 +228,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
 
                     const SizedBox(height: 28),
 
-                    // ── Duração ──────────────────────────────────────────
+                    // ── Max duration ──────────────────────────────────────
                     _SectionHeader(
                       title: l10n.filtersMaxDuration,
                       trailing: _maxDurationMinutes != null
@@ -251,7 +251,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
 
                     const SizedBox(height: 20),
 
-                    // ── Rating ───────────────────────────────────────────
+                    // ── Min rating ────────────────────────────────────────
                     _SectionHeader(
                       title: l10n.filtersMinRating,
                       trailing: _minRating > 0
@@ -264,13 +264,12 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                       max: 9.0,
                       divisions: 18,
                       label: _minRating.toStringAsFixed(1),
-                      onChanged: (v) =>
-                          setState(() => _minRating = v),
+                      onChanged: (v) => setState(() => _minRating = v),
                     ),
 
                     const SizedBox(height: 28),
 
-                    // ── Plataformas ──────────────────────────────────────
+                    // ── Platforms ─────────────────────────────────────────
                     _SectionHeader(title: l10n.filtersPlatforms),
                     const SizedBox(height: 10),
                     platformsAsync.when(
@@ -286,6 +285,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                           return _FilterChip(
                             label: p,
                             selected: sel,
+                            isDark: isDark,
                             onTap: () => setState(() => sel
                                 ? _selectedPlatforms.remove(p)
                                 : _selectedPlatforms.add(p)),
@@ -300,7 +300,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
                 ),
               ),
 
-              // ── Botão aplicar ─────────────────────────────────────────────
+              // ── Apply button ──────────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                 child: GestureDetector(
@@ -352,7 +352,7 @@ class _MovieFiltersPageState extends ConsumerState<MovieFiltersPage> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Widgets auxiliares
+// Section header
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
@@ -362,13 +362,14 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: MNColors.onBackground,
+          style: TextStyle(
+            color: cs.onSurface,
             fontSize: 15,
             fontWeight: FontWeight.w700,
           ),
@@ -387,21 +388,40 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Filter chip
+// ─────────────────────────────────────────────────────────────────────────────
+
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
+  final bool isDark;
   final VoidCallback onTap;
   final IconData? icon;
 
   const _FilterChip({
     required this.label,
     required this.selected,
+    required this.isDark,
     required this.onTap,
     this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    // Selected: always use primaryContainer + primaryLight text (works both modes)
+    // Unselected: use theme surface + onSurfaceVariant text
+    final bgColor = selected
+        ? (isDark ? MNColors.primaryContainer : const Color(0xFFEDE9FE))
+        : cs.surfaceContainerHighest;
+    final borderColor = selected
+        ? MNColors.primary
+        : cs.outlineVariant;
+    final textColor = selected ? MNColors.primaryLight : cs.onSurface;
+    final iconColor = selected ? MNColors.primaryLight : cs.onSurfaceVariant;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -411,10 +431,10 @@ class _FilterChip extends StatelessWidget {
           vertical: 7,
         ),
         decoration: BoxDecoration(
-          color: selected ? MNColors.primaryContainer : MNColors.surfaceVar,
+          color: bgColor,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: selected ? MNColors.primary : MNColors.outlineVar,
+            color: borderColor,
             width: selected ? 1.5 : 1,
           ),
         ),
@@ -422,24 +442,15 @@ class _FilterChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(
-                icon,
-                size: 13,
-                color: selected
-                    ? MNColors.primaryLight
-                    : MNColors.onSurfaceVar,
-              ),
+              Icon(icon, size: 13, color: iconColor),
               const SizedBox(width: 5),
             ],
             Text(
               label,
               style: TextStyle(
-                color: selected
-                    ? MNColors.primaryLight
-                    : MNColors.onSurface,
+                color: textColor,
                 fontSize: 12,
-                fontWeight:
-                    selected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],
@@ -448,6 +459,10 @@ class _FilterChip extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Active filters badge
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _ActiveFiltersBadge extends StatelessWidget {
   final int count;
@@ -459,7 +474,7 @@ class _ActiveFiltersBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: MNColors.primaryContainer,
+        color: Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: MNColors.primary.withOpacity(0.4)),
       ),

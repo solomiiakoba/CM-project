@@ -59,20 +59,20 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: MNColors.background,
-      // Permite que o layout encolha quando o teclado aparece
+      // Use the theme's scaffold background so ParticleBackground sits correctly
+      backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: true,
       body: ParticleBackground(
         particleCount: 30,
         child: SafeArea(
           child: SingleChildScrollView(
-            // Sobe o conteúdo quando o teclado aparece
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.symmetric(horizontal: 28),
             child: ConstrainedBox(
-              // Garante que o conteúdo ocupa pelo menos a altura do ecrã
               constraints: BoxConstraints(
                 minHeight: MediaQuery.of(context).size.height -
                     MediaQuery.of(context).padding.top -
@@ -82,12 +82,14 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── AppBar ──────────────────────────────────────────────
+                    // ── Back button ─────────────────────────────────────────
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_rounded,
-                              color: MNColors.onBackground),
+                          icon: Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: cs.onSurface,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ],
@@ -95,7 +97,7 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
 
                     const SizedBox(height: 16),
 
-                    // ── Ícone ───────────────────────────────────────────────
+                    // ── Icon ────────────────────────────────────────────────
                     Container(
                       width: 58,
                       height: 58,
@@ -120,7 +122,7 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
 
                     const SizedBox(height: 20),
 
-                    // ── Título ──────────────────────────────────────────────
+                    // ── Title ───────────────────────────────────────────────
                     ShaderMask(
                       shaderCallback: (b) => const LinearGradient(
                         colors: [MNColors.primaryLight, MNColors.secondary],
@@ -140,8 +142,8 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
 
                     Text(
                       l10n.createSessionDesc,
-                      style: const TextStyle(
-                        color: MNColors.onSurfaceVar,
+                      style: TextStyle(
+                        color: cs.onSurfaceVariant,
                         fontSize: 14,
                         height: 1.5,
                       ),
@@ -149,37 +151,62 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
 
                     const SizedBox(height: 40),
 
-                    // ── Campo de nome ───────────────────────────────────────
+                    // ── Session name label ──────────────────────────────────
                     Text(
                       l10n.createSessionLabel,
-                      style: const TextStyle(
-                        color: MNColors.onSurface,
+                      style: TextStyle(
+                        color: cs.onSurface,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
                     ),
                     const SizedBox(height: 8),
+
+                    // ── Text field ──────────────────────────────────────────
                     TextField(
                       controller: _nameController,
                       autofocus: true,
-                      style: const TextStyle(
-                        color: MNColors.onBackground,
+                      style: TextStyle(
+                        color: cs.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         hintText: l10n.createSessionHint,
-                        prefixIcon: const Icon(Icons.movie_filter_rounded,
-                            color: MNColors.primaryLight, size: 20),
+                        // Override fill colour per-theme so it's legible
+                        filled: true,
+                        fillColor: isDark
+                            ? MNColors.surfaceVar
+                            : Colors.white,
+                        prefixIcon: Icon(
+                          Icons.movie_filter_rounded,
+                          color: MNColors.primaryLight,
+                          size: 20,
+                        ),
+                        // Override borders with solid colours
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: isDark
+                                ? MNColors.outlineVar
+                                : const Color(0xFFCBD5E1),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: MNColors.primary,
+                            width: 2,
+                          ),
+                        ),
                       ),
                       onSubmitted: (_) => _createSession(),
                     ),
 
-                    // Empurra o botão para baixo (substitui Spacer)
                     const Spacer(),
                     const SizedBox(height: 32),
 
-                    // ── Botão criar ─────────────────────────────────────────
+                    // ── Create button ───────────────────────────────────────
                     GestureDetector(
                       onTap: _loading ? null : _createSession,
                       child: AnimatedContainer(
@@ -187,11 +214,14 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
                         width: double.infinity,
                         height: 58,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [MNColors.primary, MNColors.secondary],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          gradient: _loading
+                              ? null
+                              : const LinearGradient(
+                                  colors: [MNColors.primary, MNColors.secondary],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                          color: _loading ? cs.surfaceContainerHighest : null,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: _loading
                               ? []

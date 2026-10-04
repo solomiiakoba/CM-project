@@ -104,16 +104,12 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
       final repository = VotingRepositoryImpl();
       await repository.castVote(sessionId: sessionId!, vote: vote);
 
-      // Reenvia o voto para que todos os dispositivos mantenham a mesma
-      // VotingSession local. O emissor trata a mensagem como idempotente.
       await _peripheralService.sendMessage({
         'type': 'vote_cast',
         'sessionId': sessionId,
         'vote': vote.toJson(),
       });
-    } catch (_) {
-      // Ignora votos inválidos ou recebidos antes da sessão ser inicializada.
-    }
+    } catch (_) {}
   }
 
   Future<void> _sendExistingVotes(String? sessionId) async {
@@ -131,9 +127,7 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
           'vote': vote.toJson(),
         });
       }
-    } catch (_) {
-      // O participante continuará a receber os votos novos normalmente.
-    }
+    } catch (_) {}
   }
 
   Future<void> _startBluetoothAdvertising() async {
@@ -165,6 +159,8 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+
     final qrData = jsonEncode({
       'type': 'session_invite',
       'sessionId': _session.id,
@@ -176,7 +172,7 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
     final participantCount = _session.participantIds.length + 1;
 
     return Scaffold(
-      backgroundColor: MNColors.background,
+      backgroundColor: Colors.transparent,
       body: ParticleBackground(
         particleCount: 30,
         child: SafeArea(
@@ -188,14 +184,13 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
                 pinned: false,
                 title: Text(
                   l10n.lobbyTitle,
-                  style: const TextStyle(
-                    color: MNColors.onBackground,
+                  style: TextStyle(
+                    color: cs.onSurface,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_rounded,
-                      color: MNColors.onBackground),
+                  icon: Icon(Icons.arrow_back_ios_rounded, color: cs.onSurface),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -204,7 +199,7 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    // ── Nome da sessão ──────────────────────────────────
+                    // ── Session name ────────────────────────────────────
                     ShaderMask(
                       shaderCallback: (b) => const LinearGradient(
                         colors: [MNColors.primaryLight, MNColors.secondary],
@@ -222,15 +217,12 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
                     const SizedBox(height: 6),
                     Text(
                       l10n.lobbySubtitle,
-                      style: const TextStyle(
-                        color: MNColors.onSurfaceVar,
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                     ),
 
                     const SizedBox(height: 24),
 
-                    // ── Status Bluetooth ────────────────────────────────
+                    // ── Bluetooth status ────────────────────────────────
                     _BluetoothStatusCard(
                       advertising: _advertising,
                       pulseController: _pulseController,
@@ -250,7 +242,7 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
 
                     const SizedBox(height: 28),
 
-                    // ── Participantes ───────────────────────────────────
+                    // ── Participants ────────────────────────────────────
                     _ParticipantsCard(
                       session: _session,
                       participantCount: participantCount,
@@ -259,7 +251,7 @@ class _SessionLobbyPageState extends State<SessionLobbyPage>
 
                     const SizedBox(height: 28),
 
-                    // ── Botão iniciar ───────────────────────────────────
+                    // ── Start button ────────────────────────────────────
                     _GradientButton(
                       icon: Icons.play_arrow_rounded,
                       label: l10n.lobbyStartVoting,
@@ -299,13 +291,14 @@ class _BluetoothStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final activeColor =
         advertising ? MNColors.secondary : const Color(0xFFF59E0B);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: MNColors.surfaceVar,
+        color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: activeColor.withOpacity(0.4)),
       ),
@@ -371,15 +364,17 @@ class _QrCodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: MNColors.surfaceVar,
+        color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: MNColors.outlineVar),
+        border: Border.all(color: cs.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: MNColors.primary.withOpacity(0.15),
+            color: MNColors.primary.withOpacity(0.12),
             blurRadius: 30,
             offset: const Offset(0, 8),
           ),
@@ -387,7 +382,7 @@ class _QrCodeCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // QR com fundo branco
+          // QR always on white so it's scannable
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -406,8 +401,8 @@ class _QrCodeCard extends StatelessWidget {
 
           Text(
             sessionCodeLabel,
-            style: const TextStyle(
-              color: MNColors.onSurfaceVar,
+            style: TextStyle(
+              color: cs.onSurfaceVariant,
               fontSize: 12,
               letterSpacing: 1.5,
               fontWeight: FontWeight.w600,
@@ -435,7 +430,7 @@ class _QrCodeCard extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Participantes card
+// Participants card
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _ParticipantsCard extends StatelessWidget {
@@ -451,16 +446,18 @@ class _ParticipantsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: MNColors.surfaceVar,
+        color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: MNColors.outlineVar),
+        border: Border.all(color: cs.outlineVariant),
       ),
       child: Column(
         children: [
-          // Cabeçalho
+          // Header
           Row(
             children: [
               const Icon(Icons.people_rounded,
@@ -469,8 +466,8 @@ class _ParticipantsCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   l10n.lobbyParticipants,
-                  style: const TextStyle(
-                    color: MNColors.onBackground,
+                  style: TextStyle(
+                    color: cs.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
@@ -498,10 +495,10 @@ class _ParticipantsCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          const Divider(color: MNColors.outlineVar, height: 1),
+          Divider(color: cs.outlineVariant, height: 1),
           const SizedBox(height: 16),
 
-          // Organizador
+          // Organizer
           _ParticipantTile(
             icon: Icons.star_rounded,
             iconColor: const Color(0xFFFBBF24),
@@ -514,13 +511,13 @@ class _ParticipantsCard extends StatelessWidget {
             Row(
               children: [
                 const SizedBox(width: 8),
-                const Icon(Icons.hourglass_empty_rounded,
-                    size: 14, color: MNColors.onSurfaceVar),
+                Icon(Icons.hourglass_empty_rounded,
+                    size: 14, color: cs.onSurfaceVariant),
                 const SizedBox(width: 8),
                 Text(
                   l10n.lobbyWaiting,
-                  style: const TextStyle(
-                    color: MNColors.onSurfaceVar,
+                  style: TextStyle(
+                    color: cs.onSurfaceVariant,
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
                   ),
@@ -559,6 +556,8 @@ class _ParticipantTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Container(
@@ -577,16 +576,16 @@ class _ParticipantTile extends StatelessWidget {
             children: [
               Text(
                 name,
-                style: const TextStyle(
-                  color: MNColors.onSurface,
+                style: TextStyle(
+                  color: cs.onSurface,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  color: MNColors.onSurfaceVar,
+                style: TextStyle(
+                  color: cs.onSurfaceVariant,
                   fontSize: 11,
                 ),
                 maxLines: 1,
@@ -601,7 +600,7 @@ class _ParticipantTile extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Botão gradiente reutilizável
+// Gradient button
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _GradientButton extends StatelessWidget {
