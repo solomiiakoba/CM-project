@@ -1,7 +1,6 @@
-# MovieNight — Collaborative In-Person Movie Decision App
+# MovieNight - Collaborative In-Person Movie Decision App
 
 **Course:** Computação Móvel (CM)  
-**Academic Year:** 2025/2026  
 **Team Identifier:** G02  
 **Team Members:**
 - 109222 – Gustavo Gião – gustavogiao@ua.pt

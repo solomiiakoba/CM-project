@@ -1,6 +1,7 @@
 # Features and Technical Specifications — MovieNight
 
 **Course:** Computação Móvel (CM)  
+**Academic Year:** 2025/2026  
 **Team Identifier:** G02  
 **Team Members:**
 - 109222 – Gustavo Gião – gustavogiao@ua.pt
@@ -8,11 +9,26 @@
 
 ---
 
-## 1. Feature Catalog
+## 1. Feature Implementation Matrix
 
-### 1.1 Feature 1: Decoupled Session Orchestration & QR Sharing
+| Feature Identifier | Feature Name | Primary Mobile Sensors / Tech | Implementation Status | Milestone |
+|---|---|---|---|---|
+| **FEAT-01** | Decoupled Session Orchestration & QR Sharing | Camera, QR Code, Flash Storage | **[DONE]** | Milestone 1 |
+| **FEAT-02** | TMDb Ingestion & Resilient Offline Caching | HTTP Client, Connectivity, Local Cache | **[IN PROGRESS]** (Mock data & local cache active; TMDb HTTP client pending) | Milestone 2 |
+| **FEAT-03** | BLE Proximity Detection & Data Synchronization | Bluetooth Low Energy (GATT Peripheral/Central) | **[DONE]** | Milestone 2 |
+| **FEAT-04** | Tilt Gesture Voting Engine | 3-Axis Accelerometer, IMU, Haptics | **[DONE]** | Milestone 2 |
+| **FEAT-05** | Gyroscope-Powered Tie-Breaker Roulette | Rate Gyroscope (Z-Axis angular velocity) | **[PLANNED]** | Milestone 3 |
+| **FEAT-06** | Augmented Reality Winner Reveal & Plane Anchoring | Camera, SLAM Plane Detection (ARCore/ARKit) | **[PLANNED]** | Milestone 3 |
+| **FEAT-07** | Adaptive Dynamic UI (Light/Dark, i18n) | Dual Theme ColorScheme, Internationalization | **[DONE]** | Milestone 1 |
+
+---
+
+## 2. Feature Catalog
+
+### 2.1 Feature 1: Decoupled Session Orchestration & QR Sharing
+**Status:** [DONE]  
 - **Description:** Enables any user to become an ad-hoc session host. The organizer defines the room's parameters without creating an online account or registering with a cloud server.
-- **User Flow:**
+- **Implemented User Flow:**
   1. The user taps "Nova Sessão" on the home dashboard.
   2. Enters a memorable session title (e.g., "Friday Movie Night").
   3. The system generates an ephemeral session ID and encodes the room metadata into a compact JSON schema.
@@ -23,21 +39,23 @@
 
 ---
 
-### 1.2 Feature 2: TMDb Remote Ingestion & Resilient Offline Caching
+### 2.2 Feature 2: TMDb Remote Ingestion & Resilient Offline Caching
+**Status:** [IN PROGRESS] *(Filtering engine, domain models, and local caching implemented; currently backed by `MockMovieDataSource` while TMDb HTTP client integration is underway)*  
 - **Description:** Integrates with The Movie Database (TMDb) API to retrieve high-resolution posters, synopsis overviews, release years, runtimes, and user ratings based on user-defined filters.
-- **Filtering Parameters:**
+- **Implemented Filtering Parameters:**
   - **Genres:** Multi-selection across standard cinema genres (Action, Drama, Comedy, Sci-Fi, Horror, Animation, etc.).
   - **Release Window:** Dual-bound year range inputs (e.g., from 1990 to 2024).
   - **Duration Boundary:** Slider selection from 60 minutes up to 240 minutes, with an "Any Duration" unbounded setting.
   - **Minimum Rating Threshold:** Floating-point slider specifying minimum TMDb community score (0.0 to 9.0+).
   - **Streaming Provider Availability:** Multi-selection filter tailored to regional subscription services (Netflix, Disney+, HBO Max, Amazon Prime Video, Paramount+).
 - **Offline Resilience & Data Persistence:**
-  - When network access is available, queried movie models and posters are downloaded and serialized to local device flash storage.
-  - When disconnected or in airplane mode, the application automatically detects the offline condition and queries the local cache. The session proceeds without interruption.
+  - When network access is available, queried movie models and posters are downloaded and serialized to local device flash storage (`MovieLocalDataSource`).
+  - When disconnected or in airplane mode, the application queries the local cache. The session proceeds without interruption.
 
 ---
 
-### 1.3 Feature 3: Bluetooth Low Energy (BLE) Peer Detection & Data Sync
+### 2.3 Feature 3: Bluetooth Low Energy (BLE) Peer Detection & Data Sync
+**Status:** [DONE]  
 - **Description:** Establishes an ad-hoc, localized mesh network among participant devices without requiring internet access, Wi-Fi routers, or local network pairing PINs.
 - **Technical Operation:**
   - **Host (Peripheral Mode):** Advertises a custom MovieNight GATT service UUID (`00000001-0000-1000-8000-00805F9B34FB`) and hosts read/write/notify characteristics.
@@ -47,7 +65,8 @@
 
 ---
 
-### 1.4 Feature 4: Tilt Gesture Voting Engine (Inertial Sensors)
+### 2.4 Feature 4: Tilt Gesture Voting Engine (Inertial Sensors)
+**Status:** [DONE]  
 - **Description:** Replaces conventional on-screen button tapping with physical device manipulation. Users cast votes by physically tilting their smartphones.
 - **Mechanics:**
   - **Like (Affirmative Vote):** The user tilts the device to the right. The on-screen movie card rotates clockwise, translates rightward, and displays a prominent green affirmative overlay before committing.
@@ -57,7 +76,8 @@
 
 ---
 
-### 1.5 Feature 5: Gyroscope-Powered Tie-Breaker Roulette
+### 2.5 Feature 5: Gyroscope-Powered Tie-Breaker Roulette
+**Status:** [PLANNED]  
 - **Description:** In the event of a tie among top-voted movies, the application initiates an interactive group roulette to break the deadlock in a transparent, engaging manner.
 - **Sensor Integration:**
   - Utilizes the device's rate gyroscope to measure angular rotation around the vertical Z-axis ($\omega_z$).
@@ -67,7 +87,8 @@
 
 ---
 
-### 1.6 Feature 6: Augmented Reality (AR) Winner Reveal & Plane Anchoring
+### 2.6 Feature 6: Augmented Reality (AR) Winner Reveal & Plane Anchoring
+**Status:** [PLANNED]  
 - **Description:** Concludes the movie selection session with a shared visual spectacle by anchoring the winning movie's virtual 3D poster directly onto a physical surface in the room (such as a coffee table or floor).
 - **Operation:**
   - The device camera feed is analyzed in real time using platform AR engines (ARCore on Android, ARKit on iOS).
@@ -78,7 +99,8 @@
 
 ---
 
-### 1.7 Feature 7: Adaptive Dynamic UI (Light & Dark Modes, i18n Localization)
+### 2.7 Feature 7: Adaptive Dynamic UI (Light & Dark Modes, i18n Localization)
+**Status:** [DONE]  
 - **Description:** A polished visual presentation system supporting diverse user contexts, ambient lighting conditions, and languages.
 - **Theme Adaptability:**
   - **Dark Mode:** Deep purple (`#0D0B1E`) and rich violet-black surfaces with cyan highlights, paired with soft particle visualizers for home cinema environments.
@@ -88,36 +110,36 @@
 
 ---
 
-## 2. Sensor and Hardware Mapping
+## 3. Sensor and Hardware Mapping
 
-| Sensor / Hardware Component | Direct Responsibility | Feature Context |
-|---|---|---|
-| **Camera & Image Stream** | Optical QR code detection and real-time environment video capture | `ScanSessionPage`, `ARPosterPage` |
-| **Accelerometer** | Measuring lateral gravitational tilt ($A_x$) | `VotingPage` (Tinder-style gesture voting) |
-| **Rate Gyroscope** | Measuring angular velocity ($\omega_z$) during device rotation | `RoulettePage` (Tie-breaker spinning) |
-| **Bluetooth Chipset (BLE)** | Advertising (Peripheral GATT) and scanning/client connection (Central) | `SessionLobbyPage`, `BluetoothTestPage` |
-| **Haptic Actuator (Vibrator)** | Tactile feedback pulses confirming vote commitment | `VotingPage` |
-| **Flash Storage (NAND)** | Persisting session state, movie caches, and anonymous identity | SharedPreferences, Local Repository |
+| Sensor / Hardware Component | Direct Responsibility | Feature Context | Status |
+|---|---|---|---|
+| **Camera & Image Stream** | Optical QR code detection and real-time environment video capture | `ScanSessionPage`, `ARPosterPage` | [DONE] (QR) / [PLANNED] (AR) |
+| **Accelerometer** | Measuring lateral gravitational tilt ($A_x$) | `VotingPage` (Tinder-style gesture voting) | [DONE] |
+| **Rate Gyroscope** | Measuring angular velocity ($\omega_z$) during device rotation | `RoulettePage` (Tie-breaker spinning) | [PLANNED] |
+| **Bluetooth Chipset (BLE)** | Advertising (Peripheral GATT) and scanning/client connection (Central) | `SessionLobbyPage`, `BluetoothTestPage` | [DONE] |
+| **Haptic Actuator (Vibrator)** | Tactile feedback pulses confirming vote commitment | `VotingPage` | [DONE] |
+| **Flash Storage (NAND)** | Persisting session state, movie caches, and anonymous identity | SharedPreferences, Local Repository | [DONE] |
 
 ---
 
-## 3. Technical Challenges and Contingency Strategies
+## 4. Technical Challenges and Contingency Strategies
 
-### 3.1 Challenge 1: Augmented Reality Reliability Across Diverse Hardware
+### 4.1 Challenge 1: Augmented Reality Reliability Across Diverse Hardware
 - **Risk:** Flutter AR integration packages (e.g., `ar_flutter_plugin`, `arkit_flutter_plugin`) exhibit fragmentation across Android vendor implementations, camera sensor calibrations, and ARCore compatibility levels. Certain budget devices lack hardware-accelerated Depth APIs.
 - **Contingency Strategy:**
   1. The application executes a capability check during initialization (`isArSupported()`).
   2. If ARCore/ARKit is available, planar SLAM tracking is enabled.
   3. If unavailable, or if plane detection times out after 10 seconds, the UI gracefully switches to **Camera Viewport Overlay Mode**, rendering a celebratory 3D-perspective poster billboard over the live camera feed without requiring plane anchoring.
 
-### 3.2 Challenge 2: Bluetooth Low Energy GATT Stability & Cross-Platform Permissions
+### 4.2 Challenge 2: Bluetooth Low Energy GATT Stability & Cross-Platform Permissions
 - **Risk:** Modern mobile operating systems (especially Android 12+ and iOS 14+) enforce stringent runtime permissions for Bluetooth advertising and scanning (including location and nearby devices permissions). Furthermore, some budget chipsets restrict simultaneous peripheral advertising and central scanning.
 - **Contingency Strategy:**
   1. Strict role separation: the session creator operates as the GATT Peripheral (advertiser), while participants operate strictly as GATT Centrals (scanners).
   2. The primary joining mechanism is dual-channel: the QR code contains the full session payload so that even if BLE advertising is delayed, peers immediately obtain the entire movie list and configuration optically.
   3. Payload fragmentation: large movie catalogs are indexed by TMDb IDs rather than raw strings, minimizing BLE transmission sizes below 512-byte MTU limits.
 
-### 3.3 Challenge 3: Balancing Advanced Sensor Features with Core Usability
+### 4.3 Challenge 3: Balancing Advanced Sensor Features with Core Usability
 - **Risk:** Overburdening the user with complex sensor rituals can distract from the application's fundamental objective: helping friends quickly choose a movie.
 - **Contingency Strategy:**
   - Every physical gesture interaction (tilt voting, phone spinning, AR reveal) has an immediate on-screen button alternative.
