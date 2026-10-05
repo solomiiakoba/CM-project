@@ -7,7 +7,7 @@ import 'bluetooth_service.dart';
 import 'movie_night_ble_client.dart';
 import '../../shared/utils/participant_identity_service.dart';
 import '../../features/session/domain/entities/session.dart';
-import '../../features/movies/domain/movie.dart';
+import '../../features/movies/domain/entities/movie.dart';
 import '../../features/voting/presentation/pages/voting_page.dart';
 import '../../features/voting/presentation/providers/voting_notifier.dart';
 
@@ -44,7 +44,6 @@ class _BluetoothTestPageState
 
   String? _participantId;
   String? _connectionStatus;
-  String? _lastReceivedMessage;
 
   List<ScanResult> _devices = [];
 
@@ -73,11 +72,6 @@ class _BluetoothTestPageState
         _bleClient.messages.listen(
       (message) {
         if (!mounted) return;
-
-        setState(() {
-          _lastReceivedMessage =
-              message.toString();
-        });
 
         _handleIncomingSessionMessage(message);
       },
@@ -234,11 +228,11 @@ class _BluetoothTestPageState
       await _bluetoothService
           .stopScan();
 
-      if (!mounted) return;
-
-      setState(() {
-        _scanning = false;
-      });
+      if (mounted) {
+        setState(() {
+          _scanning = false;
+        });
+      }
     }
   }
 
@@ -297,11 +291,11 @@ class _BluetoothTestPageState
         ),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        _connecting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _connecting = false;
+        });
+      }
     }
   }
 

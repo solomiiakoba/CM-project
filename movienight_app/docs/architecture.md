@@ -28,18 +28,19 @@ The system follows a three-tier Clean Architecture model implemented in Flutter 
 flowchart TD
     subgraph Presentation_Layer["Presentation Layer (Flutter & Riverpod)"]
         UI["Widgets / Pages\n(CreateSession, Lobby, Voting, Results)"]
-        Notifiers["StateNotifiers & Controllers\n(VotingNotifier, MoviesProvider, SessionController)"]
+        Notifiers["StateNotifiers & Controllers\n(VotingNotifier, MoviesProvider, SessionLobbyNotifier, SessionController)"]
         Theme["Theme & Localization\n(MovieNightTheme, AppLocalizations)"]
     end
 
     subgraph Domain_Layer["Domain Layer (Pure Dart)"]
         Entities["Domain Entities\n(Session, Movie, Vote, VotingSession, MovieFilters)"]
         RepoInterfaces["Repository Interfaces\n(VotingRepository, MoviesRepository, SessionRepository)"]
+        UseCases["Use Cases\n(CreateSession, ParseQrSession, GetActiveSession)"]
     end
 
     subgraph Data_Layer["Data & Infrastructure Layer"]
-        RepoImpl["Repository Implementations\n(VotingRepositoryImpl, MoviesRepositoryImpl)"]
-        Sources["Data Sources & Drivers\n(TMDbApiClient, LocalStorage, SharedPreferences)"]
+        RepoImpl["Repository Implementations\n(VotingRepositoryImpl, MoviesRepositoryImpl, SessionRepositoryImpl)"]
+        Sources["Data Sources & Drivers\n(TMDbApiClient, LocalStorage, SharedPreferences, SessionLocalDataSource)"]
         Sensors["Hardware & Sensor Drivers\n(PeripheralService, BleClient, IMU Sensors, Camera)"]
     end
 
@@ -52,25 +53,65 @@ flowchart TD
 ```
 
 ### 2.1 Presentation Layer
-- **Components:** Stateful and stateless widgets, particle field renderers, custom canvas painters, and responsive layouts.
+- **Components:** Stateful and stateless widgets, particle field renderers, custom canvas painters, and responsive layouts. Pages follow a declarative composition model where screen files orchestrate reusable feature widgets (e.g., headers, state views, filter sections, modals, and action buttons).
 - **State Management:** Utilizes **Flutter Riverpod** (`StateNotifierProvider`, `ConsumerWidget`). State models are strictly immutable. UI components never access storage or sensors directly; they react to reactive state streams.
 - **Design System:** Features a dual-palette architecture (`MovieNightTheme.light` and `MovieNightTheme.dark`) driven by Material 3 `ColorScheme` contracts, avoiding hardcoded hex colors and allowing instantaneous theme transitions.
 
 ### 2.2 Domain Layer
 - **Pure Business Logic:** Contains zero dependencies on Flutter rendering engines or platform libraries.
-- **Entities:**
-  - `Session`: Encapsulates room identity, organizer UUID, participant rosters, and timestamp metadata.
+- **Entities (`domain/entities/`):**
   - `Movie`: Models cinematic metadata (TMDb identifier, title, release date, runtime, rating, genres, poster path, streaming providers).
-  - `Vote`: Represents an individual user decision (`sessionId`, `participantId`, `movieId`, `isAffirmative`, `timestamp`).
-  - `VotingSession`: An immutable aggregate root computing rankings, like counts, and detecting tie scenarios.
   - `MovieFilters`: Value object specifying genre subsets, year brackets, rating thresholds, and runtime constraints.
-- **Repository Contracts:** Abstract interfaces defining data storage and communication capabilities without exposing implementation details.
+  - `Genre`: Models localized genre representation (ID, PT name, EN name).
+  - `AppSettings`: Models application-wide configuration (ThemeMode, Locale).
+  - `Vote`: Models individual participant vote on a candidate movie.
+  - `VotingSession`: Aggregate root computing movie ranking and like tallies.
+  - `HomeQuickAction`: Models primary navigation actions on the landing view.
+- **Exceptions (`domain/exceptions/`):**
+  - `MovieException`, `TmdbApiException`, `TmdbApiKeyException`, `MovieNetworkException`.
+  - `SessionException`, `SessionNotFoundException`, `InvalidSessionPayloadException`, `SessionConnectionException`.
+  - `VotingException`, `VotingSessionNotFoundException`, `VotingStorageException`.
+- **Repository Contracts (`domain/repositories/`):**
+  - `MovieRepository`: Abstract contract defining movie retrieval, caching, and streaming provider lookups.
+  - `SessionRepository`: Abstract contract defining session persistence and discovery.
+  - `SettingsRepository`: Abstract contract defining configuration retrieval and preferences storage.
+  - `VotingRepository`: Abstract contract defining voting session persistence and vote registration.
+  - `HomeRepository`: Abstract contract defining quick actions retrieval.
+- **Use Cases (`domain/usecases/`):**
+  - `CreateSessionUseCase`, `GetActiveSessionUseCase`, `ParseQrSessionUseCase`.
+  - `GetSettingsUseCase`, `UpdateThemeUseCase`, `UpdateLocaleUseCase`.
+  - `SaveVotingSessionUseCase`, `GetVotingSessionUseCase`, `CastVoteUseCase`, `ClearVotingSessionUseCase`.
+  - `GetHomeActionsUseCase`.
 
 ### 2.3 Data Layer
-- **TMDb REST Client:** Interacts with the public TMDb REST API over HTTP, parsing JSON payloads into domain models with caching fallbacks.
-- **Local Persistence Source:** Serializes session state, active configurations, and movie dictionaries into device-local storage.
-- **Bluetooth Low Energy (BLE) Engine:** Wraps platform-native Bluetooth stacks to perform advertising (Peripheral Mode) and scanning/connection (Central Mode).
-- **Inertial Sensor Service:** Interfaces with the platform IMU streams (`accelerometerEventStream`, `gyroscopeEventStream`), normalizing raw multi-axis acceleration into bounded angle metrics.
+- **Data Sources (`data/datasources/`):**
+  - `TmdbApiClient`: Pure HTTP client querying `/discover/movie`, `/movie/{id}/watch/providers`, and `/genre/movie/list`.
+  - `TmdbGenreCatalog`: Constant catalog of the 19 official TMDb genres and PT streaming provider lookup tables.
+  - `MovieLocalDataSource`: Session-scoped and persistent global cache using `SharedPreferences`.
+  - `MockMovieDataSource`: Offline dataset used for zero-network fallback and air-gapped guarantees.
+  - `SessionLocalDataSource`: Active session state cache stored in `SharedPreferences`.
+  - `SettingsLocalDataSource`: Application preferences persistence layer backing theme and locale keys.
+  - `VotingLocalDataSource`: Session voting state and ledger cache in `SharedPreferences`.
+  - `HomeLocalDataSource`: Navigation entries catalog.
+- **Data Models / DTOs (`data/models/`):**
+  - `TmdbMovieDto`: Deserializes raw TMDb JSON responses and converts them into the clean domain `Movie` entity via `toDomain()`.
+  - `TmdbGenreModel`: Deserializes TMDb genre API payloads.
+  - `SessionDto`: JSON serialization and mapping for session aggregate roots.
+  - `SettingsDto`: Deserializes and serializes persisted configuration maps.
+  - `VoteDto`: DTO mapping participant vote records.
+  - `VotingSessionDto`: DTO mapping multi-participant voting sessions and ranking.
+- **Repositories (`data/repositories/`):**
+  - `MovieRepositoryImpl`: Clean Architecture repository implementation coordinating TMDb remote fetching, local persistence, and offline fallback.
+  - `SessionRepositoryImpl`: Manages active session lifecycle in storage.
+  - `SettingsRepositoryImpl`: Implements configuration retrieval and persistence logic.
+  - `VotingRepositoryImpl`: Implements voting state lifecycle and vote persistence.
+  - `HomeRepositoryImpl`: Provides quick action domain models.
+
+### 2.4 Presentation Layer
+- **Pages (`presentation/pages/`):** Modular compositions (`HomePage`, `MoviesListPage`, `MovieFiltersPage`, `CreateSessionPage`, `ScanSessionPage`, `SessionLobbyPage`, `SettingsPage`, `VotingPage`, `ResultsPage`).
+- **Providers (`presentation/providers/`):** Riverpod state notifiers (`homeActionsProvider`, `moviesProvider`, `movieFiltersProvider`, `sessionLobbyNotifierProvider`, `appSettingsProvider`, `themeProvider`, `localeProvider`, `votingProvider`, `votingProviders`).
+- **Services (`presentation/services/`):** Hardware sensor and gesture controllers (`TiltSensorService`).
+- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic.
 
 ---
 

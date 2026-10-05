@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Paleta de cores MovieNight
-// ─────────────────────────────────────────────────────────────────────────────
-
 class MNColors {
   MNColors._();
 
@@ -143,7 +139,7 @@ class MovieNightTheme {
           return MNColors.primary;
         }),
         foregroundColor: WidgetStateProperty.all(MNColors.onPrimary),
-        overlayColor: WidgetStateProperty.all(MNColors.primaryLight.withOpacity(0.12)),
+        overlayColor: WidgetStateProperty.all(MNColors.primaryLight.withValues(alpha: 0.12)),
         elevation: WidgetStateProperty.all(0),
         padding: WidgetStateProperty.all(
           const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -316,7 +312,7 @@ class MovieNightTheme {
           return MNColors.primary;
         }),
         foregroundColor: WidgetStateProperty.all(MNColors.onPrimary),
-        overlayColor: WidgetStateProperty.all(MNColors.primaryLight.withOpacity(0.12)),
+        overlayColor: WidgetStateProperty.all(MNColors.primaryLight.withValues(alpha: 0.12)),
         elevation: WidgetStateProperty.all(0),
         padding: WidgetStateProperty.all(
           const EdgeInsets.symmetric(horizontal: 24, vertical: 14),

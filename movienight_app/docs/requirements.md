@@ -13,9 +13,9 @@
 
 | Section | Total Items | [DONE] Completed | [IN PROGRESS] | [PLANNED] Next Milestone |
 |---|---|---|---|---|
-| **Functional Requirements (FR)** | 24 | 18 | 2 | 4 |
+| **Functional Requirements (FR)** | 24 | 19 | 1 | 4 |
 | **Non-Functional Requirements (NFR)** | 14 | 12 | 2 | 0 |
-| **Overall Completion** | 38 | 30 (78.9%) | 4 (10.5%) | 4 (10.5%) |
+| **Overall Completion** | 38 | 31 (81.6%) | 3 (7.9%) | 4 (10.5%) |
 
 ---
 
@@ -60,7 +60,7 @@ Crucially, the entire experience is architected without reliance on a dedicated 
 - **[DONE] FR-08 (Zero-Account Identity):** The application must generate and persist an anonymous, unique participant UUID locally on each device, eliminating third-party authentication dependencies (e.g., Google or Facebook OAuth).
 
 ### 4.3 Movie Retrieval and Local Persistence
-- **[IN PROGRESS] FR-09 (External API Consumption):** The application must interface with The Movie Database (TMDb) REST API using an application-level API token to query titles, posters, release metadata, overviews, and ratings. *(Currently using MockMovieDataSource with filtering logic and local cache while the live TMDb HTTP client is being connected)*.
+- **[DONE] FR-09 (External API Consumption):** The application must interface with The Movie Database (TMDb) REST API using an application-level API token to query titles, posters, release metadata, overviews, and ratings.
 - **[DONE] FR-10 (Decoupled Offline-First Storage):** All fetched movie datasets, session definitions, and user cast votes must be persisted in local storage (such as SharedPreferences and local database cache) to enable session continuity in air-gapped or disconnected environments.
 - **[DONE] FR-11 (Connectivity Awareness):** The application must continuously monitor network reachability. When offline, it must gracefully fall back to locally cached movie catalogs without blocking session creation or progression.
 
@@ -126,4 +126,4 @@ Crucially, the entire experience is architected without reliance on a dedicated 
 | **Rate Gyroscope** | Tie-Breaking Roulette (`RoulettePage`) | Converts rotational velocity into angular momentum for spinning the selection wheel. | [PLANNED] | Manual swipe-to-spin gesture. |
 | **Bluetooth Low Energy (BLE)** | Peer Proximity & Session Sync | Ad-hoc discovery (advertising/scanning) and transmission of vote payloads. | [DONE] | Direct QR configuration and local tallying. |
 | **AR Engine (Camera + SLAM)** | Winner Announcement (`ARPosterPage`) | Detects horizontal planes in physical space to anchor the winning poster. | [PLANNED] | 2D camera viewport overlay / animated showcase. |
-| **Network Connectivity** | Movie Fetching (`TMDb API`) | Fetches rich movie metadata, posters, overviews, and ratings. | [IN PROGRESS] | Embedded offline movie database cache. |
+| **Network Connectivity** | Movie Fetching (`TMDb API`) | Fetches rich movie metadata, posters, overviews, and ratings. | [DONE] | Embedded offline movie database cache. |

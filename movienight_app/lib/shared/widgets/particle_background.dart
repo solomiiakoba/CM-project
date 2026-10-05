@@ -186,7 +186,7 @@ class _ParticlePainter extends CustomPainter {
         (p.x * 100 + p.y * 37).toInt().abs() % colors.length
       ];
 
-      paint.color = color.withOpacity(p.opacity * pulse);
+      paint.color = color.withValues(alpha: p.opacity * pulse);
 
       canvas.drawCircle(
         Offset(p.x * size.width, p.y * size.height),

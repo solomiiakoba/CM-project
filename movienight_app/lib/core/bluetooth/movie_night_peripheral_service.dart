@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
@@ -53,7 +52,7 @@ class MovieNightPeripheralService {
   ///
   /// Mensagens maiores que [_chunkSize] são automaticamente partidas em
   /// chunks com envelope:
-  ///   {"_chunk": <index>, "_total": <n>, "_data": "<base64_slice>"}
+  ///   `{"_chunk": <index>, "_total": <n>, "_data": "<base64_slice>"}`
   ///
   /// O receptor deve reassemblar antes de fazer jsonDecode.
   Future<void> sendMessage(Map<String, dynamic> message) async {

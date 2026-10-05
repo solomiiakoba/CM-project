@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/settings/presentation/providers/settings_providers.dart';
 
 final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
-  return ThemeNotifier();
+  final repository = ref.watch(settingsRepositoryProvider);
+  return ThemeNotifier(repository);
 });
 
 class ThemeNotifier extends StateNotifier<ThemeMode> {
-  static const String _themeKey = 'app_theme_mode';
+  final SettingsRepository _repository;
 
-  ThemeNotifier() : super(ThemeMode.system) {
+  ThemeNotifier(this._repository) : super(ThemeMode.system) {
     _loadTheme();
   }
 
   Future<void> _loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isDarkMode = prefs.getBool(_themeKey);
-    
-    if (isDarkMode != null) {
-      state = isDarkMode ? ThemeMode.dark : ThemeMode.light;
-    } else {
-      state = ThemeMode.system;
-    }
+    final settings = await _repository.getSettings();
+    state = settings.themeMode;
   }
 
   Future<void> toggleTheme(bool isDark) async {
-    state = isDark ? ThemeMode.dark : ThemeMode.light;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_themeKey, isDark);
+    final mode = isDark ? ThemeMode.dark : ThemeMode.light;
+    state = mode;
+    await _repository.saveThemeMode(mode);
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    state = mode;
+    await _repository.saveThemeMode(mode);
   }
 }

@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:movienight_app/app/theme.dart';
-import 'package:movienight_app/features/movies/presentation/providers/movies_provider.dart';
-import 'package:movienight_app/features/movies/presentation/widgets/movie_card.dart';
-import 'package:movienight_app/features/voting/presentation/pages/voting_page.dart';
-import 'package:movienight_app/features/voting/presentation/providers/voting_notifier.dart';
-import 'package:movienight_app/features/voting/data/voting_repository_impl.dart';
-import 'package:movienight_app/features/voting/domain/entities/voting_session.dart';
 import 'package:movienight_app/core/bluetooth/movie_night_peripheral_service.dart';
+import 'package:movienight_app/features/movies/presentation/providers/movies_provider.dart';
+import 'package:movienight_app/features/movies/presentation/widgets/gradient_action_button.dart';
+import 'package:movienight_app/features/movies/presentation/widgets/movie_card.dart';
+import 'package:movienight_app/features/movies/presentation/widgets/movie_count_badge.dart';
+import 'package:movienight_app/features/movies/presentation/widgets/movie_details_bottom_sheet.dart';
+import 'package:movienight_app/features/movies/presentation/widgets/movie_page_header.dart';
+import 'package:movienight_app/features/movies/presentation/widgets/movies_state_views.dart';
+import 'package:movienight_app/features/voting/domain/entities/voting_session.dart';
+import 'package:movienight_app/features/voting/presentation/pages/voting_page.dart';
+import 'package:movienight_app/features/voting/presentation/providers/voting_providers.dart';
+import 'package:movienight_app/l10n/app_localizations.dart';
+import 'package:movienight_app/shared/providers/locale_provider.dart';
 import 'package:movienight_app/shared/utils/participant_identity_service.dart';
 import 'package:movienight_app/shared/widgets/particle_background.dart';
-import 'package:movienight_app/l10n/app_localizations.dart';
 
+/// Ecrã que apresenta a listagem de filmes descobertos com base nos filtros selecionados.
 class MoviesListPage extends ConsumerStatefulWidget {
   final String sessionId;
 
@@ -40,16 +45,17 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
 
   Future<void> _loadMovies() async {
     final filters = ref.read(movieFiltersProvider);
+    final lang = ref.read(localeProvider).languageCode;
     await ref.read(moviesProvider.notifier).loadMovies(
           filters: filters,
           sessionId: widget.sessionId,
+          languageCode: lang,
         );
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final cs = Theme.of(context).colorScheme;
     final moviesState = ref.watch(moviesProvider);
 
     return Scaffold(
@@ -59,45 +65,14 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // ── AppBar ──────────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back_ios_rounded,
-                          color: cs.onSurface),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    Expanded(
-                      child: Text(
-                        l10n.moviesTitle,
-                        style: TextStyle(
-                          color: cs.onSurface,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    if (!moviesState.isLoading && moviesState.hasMovies)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: cs.primaryContainer,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          l10n.moviesCount(moviesState.movies.length),
-                          style: const TextStyle(
-                            color: MNColors.primaryLight,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+              // ── Header ──────────────────────────────────────────────────
+              MoviePageHeader(
+                title: l10n.moviesTitle,
+                trailing: (!moviesState.isLoading && moviesState.hasMovies)
+                    ? MovieCountBadge(
+                        label: l10n.moviesCount(moviesState.movies.length),
+                      )
+                    : null,
               ),
 
               // ── Body ────────────────────────────────────────────────────
@@ -105,58 +80,12 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
 
               // ── Vote button ──────────────────────────────────────────────
               if (moviesState.hasMovies)
-                Padding(
+                GradientActionButton(
+                  label: l10n.moviesStartVoting,
+                  icon: Icons.how_to_vote_rounded,
+                  isLoading: _startingVoting,
+                  onTap: _startVoting,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: GestureDetector(
-                    onTap: _startingVoting
-                        ? null
-                        : () => _startVoting(context),
-                    child: Container(
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [MNColors.primary, MNColors.secondary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: MNColors.primary.withOpacity(0.4),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (_startingVoting)
-                            const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  color: Colors.white, strokeWidth: 2.5),
-                            )
-                          else ...[
-                            const Icon(Icons.how_to_vote_rounded,
-                                color: Colors.white, size: 20),
-                            const SizedBox(width: 10),
-                            Text(
-                              l10n.moviesStartVoting,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
                 ),
             ],
           ),
@@ -171,65 +100,19 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
     MoviesState state,
   ) {
     if (state.isLoading) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text(l10n.moviesLoading),
-          ],
-        ),
-      );
+      return const MoviesLoadingView();
     }
 
     if (state.hasError) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(l10n.moviesError, textAlign: TextAlign.center),
-              const SizedBox(height: 8),
-              Text(
-                state.errorMessage!,
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _loadMovies,
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.moviesRetry),
-              ),
-            ],
-          ),
-        ),
+      return MoviesErrorView(
+        errorMessage: state.errorMessage!,
+        onRetry: _loadMovies,
       );
     }
 
     if (state.movies.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.movie_outlined, size: 64),
-              const SizedBox(height: 16),
-              Text(l10n.moviesEmpty, textAlign: TextAlign.center),
-              const SizedBox(height: 24),
-              OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.tune),
-                label: Text(l10n.filtersReset),
-              ),
-            ],
-          ),
-        ),
+      return MoviesEmptyView(
+        onAdjustFilters: () => Navigator.pop(context),
       );
     }
 
@@ -248,12 +131,12 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             itemCount: state.movies.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final movie = state.movies[index];
               return MovieCard(
                 movie: movie,
-                onTap: () => _showMovieDetails(context, movie),
+                onTap: () => MovieDetailsBottomSheet.show(context, movie),
               );
             },
           ),
@@ -262,102 +145,7 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
     );
   }
 
-  void _showMovieDetails(BuildContext context, movie) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.55,
-        maxChildSize: 0.9,
-        builder: (_, scrollController) => Padding(
-          padding: const EdgeInsets.all(20),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                movie.title,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.star_rounded, color: Colors.amber[600], size: 18),
-                  const SizedBox(width: 4),
-                  Text('${movie.rating.toStringAsFixed(1)}  •  '),
-                  Text(l10n.movieYear(movie.releaseYear)),
-                  if (movie.durationMinutes != null) ...[
-                    const Text('  •  '),
-                    Text(l10n.movieDuration(movie.durationMinutes!)),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 6,
-                runSpacing: 4,
-                children: movie.genres.map<Widget>((g) {
-                  return Chip(
-                    label: Text(g),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    padding: EdgeInsets.zero,
-                    labelStyle: Theme.of(context).textTheme.labelSmall,
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                movie.overview,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              if (movie.streamingPlatforms.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Text(
-                  'Disponível em:',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  spacing: 6,
-                  children: movie.streamingPlatforms.map<Widget>((p) {
-                    return Chip(
-                      avatar:
-                          const Icon(Icons.play_circle_outline, size: 16),
-                      label: Text(p),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: EdgeInsets.zero,
-                      labelStyle: Theme.of(context).textTheme.labelSmall,
-                    );
-                  }).toList(),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _startVoting(BuildContext context) async {
+  Future<void> _startVoting() async {
     if (_startingVoting) return;
 
     final movies = ref.read(moviesProvider).movies;
@@ -368,7 +156,7 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
     try {
       final organizerId =
           await ParticipantIdentityService().getParticipantId();
-      await VotingRepositoryImpl().saveVotingSession(
+      await ref.read(saveVotingSessionUseCaseProvider)(
         VotingSession(
           sessionId: widget.sessionId,
           movieIds: movies.map((movie) => movie.id).toList(),
@@ -397,7 +185,6 @@ class _MoviesListPageState extends ConsumerState<MoviesListPage> {
       peripheralService: _peripheralService,
     );
 
-    // ignore: use_build_context_synchronously
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => VotingPage(params: params)),

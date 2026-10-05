@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:movienight_app/app/theme.dart';
-import 'package:movienight_app/features/movies/domain/movie.dart';
+import 'package:movienight_app/features/movies/domain/entities/movie.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
 
 /// Card for a movie — adapts to light and dark theme.
@@ -30,7 +29,7 @@ class MovieCard extends StatelessWidget {
           border: Border.all(color: cs.outlineVariant),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.25 : 0.08),
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -205,7 +204,7 @@ class _PosterWidget extends StatelessWidget {
         child: Image.network(
           posterPath!,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(context),
+          errorBuilder: (_, _, _) => _placeholder(context),
         ),
       );
     }

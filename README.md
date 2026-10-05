@@ -26,11 +26,11 @@ MovieNight is a mobile application developed for groups of friends physically ga
 
 ## 2. Technical Documentation
 
-Detailed technical documentation is available in the `/docs` directory:
+Detailed technical documentation is available in the [`movienight_app/docs`](movienight_app/docs) directory:
 
-- **[Requirements Specification (`docs/requirements.md`)](docs/requirements.md):** Complete catalog of Functional Requirements (FR-01 to FR-24), Non-Functional Requirements (NFR-01 to NFR-14), user personas, and hardware capability mapping.
-- **[Architectural Design Document (`docs/architecture.md`)](docs/architecture.md):** Clean Architecture breakdown, Riverpod reactive state flow, peer-to-peer BLE star-mesh topology, mathematical IMU sensor pipeline, and sequence diagrams.
-- **[Features & Sensor Specifications (`docs/features.md`)](docs/features.md):** Exhaustive breakdown of all 7 core features, mobile hardware roles, user journeys, accessibility considerations, and contingency strategies.
+- **[Requirements Specification (`movienight_app/docs/requirements.md`)](movienight_app/docs/requirements.md):** Complete catalog of Functional Requirements (FR-01 to FR-24), Non-Functional Requirements (NFR-01 to NFR-14), user personas, and hardware capability mapping.
+- **[Architectural Design Document (`movienight_app/docs/architecture.md`)](movienight_app/docs/architecture.md):** Clean Architecture breakdown, Riverpod reactive state flow, peer-to-peer BLE star-mesh topology, mathematical IMU sensor pipeline, and sequence diagrams.
+- **[Features & Sensor Specifications (`movienight_app/docs/features.md`)](movienight_app/docs/features.md):** Exhaustive breakdown of all 7 core features, mobile hardware roles, user journeys, accessibility considerations, and contingency strategies.
 
 ---
 

@@ -1,5 +1,5 @@
-import 'package:movienight_app/features/movies/domain/movie.dart';
-import 'package:movienight_app/features/movies/domain/movie_filters.dart';
+import 'package:movienight_app/features/movies/domain/entities/movie.dart';
+import 'package:movienight_app/features/movies/domain/entities/movie_filters.dart';
 
 /// Fonte de dados mock com um dataset embutido de filmes populares.
 /// Substitui por TmdbDataSource ou OMDbDataSource quando tiveres a API key.

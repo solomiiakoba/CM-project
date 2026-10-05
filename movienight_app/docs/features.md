@@ -14,7 +14,7 @@
 | Feature Identifier | Feature Name | Primary Mobile Sensors / Tech | Implementation Status | Milestone |
 |---|---|---|---|---|
 | **FEAT-01** | Decoupled Session Orchestration & QR Sharing | Camera, QR Code, Flash Storage | **[DONE]** | Milestone 1 |
-| **FEAT-02** | TMDb Ingestion & Resilient Offline Caching | HTTP Client, Connectivity, Local Cache | **[IN PROGRESS]** (Mock data & local cache active; TMDb HTTP client pending) | Milestone 2 |
+| **FEAT-02** | TMDb Ingestion & Resilient Offline Caching | TMDb REST API v3, HTTP, Local Flash Cache | **[DONE]** | Milestone 2 |
 | **FEAT-03** | BLE Proximity Detection & Data Synchronization | Bluetooth Low Energy (GATT Peripheral/Central) | **[DONE]** | Milestone 2 |
 | **FEAT-04** | Tilt Gesture Voting Engine | 3-Axis Accelerometer, IMU, Haptics | **[DONE]** | Milestone 2 |
 | **FEAT-05** | Gyroscope-Powered Tie-Breaker Roulette | Rate Gyroscope (Z-Axis angular velocity) | **[PLANNED]** | Milestone 3 |
@@ -40,17 +40,17 @@
 ---
 
 ### 2.2 Feature 2: TMDb Remote Ingestion & Resilient Offline Caching
-**Status:** [IN PROGRESS] *(Filtering engine, domain models, and local caching implemented; currently backed by `MockMovieDataSource` while TMDb HTTP client integration is underway)*  
+**Status:** [DONE]  
 - **Description:** Integrates with The Movie Database (TMDb) API to retrieve high-resolution posters, synopsis overviews, release years, runtimes, and user ratings based on user-defined filters.
 - **Implemented Filtering Parameters:**
-  - **Genres:** Multi-selection across standard cinema genres (Action, Drama, Comedy, Sci-Fi, Horror, Animation, etc.).
-  - **Release Window:** Dual-bound year range inputs (e.g., from 1990 to 2024).
-  - **Duration Boundary:** Slider selection from 60 minutes up to 240 minutes, with an "Any Duration" unbounded setting.
-  - **Minimum Rating Threshold:** Floating-point slider specifying minimum TMDb community score (0.0 to 9.0+).
-  - **Streaming Provider Availability:** Multi-selection filter tailored to regional subscription services (Netflix, Disney+, HBO Max, Amazon Prime Video, Paramount+).
+  - **Genres:** Multi-selection across standard cinema genres (Action, Drama, Comedy, Sci-Fi, Horror, Animation, etc.) mapped directly to TMDb genre IDs.
+  - **Release Window:** Dual-bound year range inputs (`primary_release_date.gte` / `primary_release_date.lte`).
+  - **Duration Boundary:** Slider selection from 60 minutes up to 240 minutes (`with_runtime.lte`).
+  - **Minimum Rating Threshold:** Floating-point slider specifying minimum TMDb community score (`vote_average.gte`).
+  - **Streaming Provider Availability:** Multi-selection filter tailored to regional subscription services in Portugal (`watch_region=PT`).
 - **Offline Resilience & Data Persistence:**
-  - When network access is available, queried movie models and posters are downloaded and serialized to local device flash storage (`MovieLocalDataSource`).
-  - When disconnected or in airplane mode, the application queries the local cache. The session proceeds without interruption.
+  - Remote movie queries are fetched via `TmdbApiClient` and automatically serialized to local device storage (`MovieLocalDataSource`).
+  - When disconnected or in airplane mode, the application gracefully falls back to local cache or bundled fallback models, ensuring the session proceeds without interruption.
 
 ---
 
