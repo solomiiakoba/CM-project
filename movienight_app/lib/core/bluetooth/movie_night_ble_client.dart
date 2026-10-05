@@ -64,7 +64,7 @@ class MovieNightBleClient {
 
     await device.connect(
       timeout: const Duration(seconds: 15),
-      license: License.free,
+      license: License.nonprofit,
     );
 
     _connectedDevice = device;

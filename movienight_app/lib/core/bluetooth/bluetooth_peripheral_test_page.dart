@@ -101,11 +101,11 @@ class _BluetoothPeripheralTestPageState
         ),
       );
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
