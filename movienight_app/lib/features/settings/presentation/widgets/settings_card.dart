@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:movienight_app/shared/widgets/glass_container.dart';
+
+/// Contentor moderno com estilo glassmorphic, totalmente adaptado para temas claro e escuro.
 class SettingsCard extends StatelessWidget {
   final List<Widget> children;
 
@@ -10,22 +13,20 @@ class SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cardColor = theme.cardTheme.color ?? theme.colorScheme.surfaceContainerHighest;
-    final borderColor = theme.colorScheme.outlineVariant;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-      ),
+    final dividerColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : cs.outlineVariant.withValues(alpha: 0.5);
+
+    return GlassContainer(
       child: Column(
         children: List.generate(children.length * 2 - 1, (index) {
           if (index.isOdd) {
             return Divider(
               height: 1,
-              color: borderColor,
+              color: dividerColor,
               indent: 58,
             );
           }

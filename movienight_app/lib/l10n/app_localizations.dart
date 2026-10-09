@@ -185,14 +185,86 @@ abstract class AppLocalizations {
   /// No description provided for @createSessionSubtitle.
   ///
   /// In pt, this message translates to:
-  /// **'Vamos começar uma Movie Night 🍿'**
+  /// **'Configura a tua Movie Night'**
   String get createSessionSubtitle;
 
   /// No description provided for @createSessionDesc.
   ///
   /// In pt, this message translates to:
-  /// **'Define algumas informações para a sessão.'**
+  /// **'Personaliza a sessão antes de convidar o teu grupo.'**
   String get createSessionDesc;
+
+  /// No description provided for @createSessionPresetFriday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sexta de Cinema'**
+  String get createSessionPresetFriday;
+
+  /// No description provided for @createSessionPresetHorror.
+  ///
+  /// In pt, this message translates to:
+  /// **'Noite de Terror'**
+  String get createSessionPresetHorror;
+
+  /// No description provided for @createSessionPresetSciFi.
+  ///
+  /// In pt, this message translates to:
+  /// **'Maratona Sci-Fi'**
+  String get createSessionPresetSciFi;
+
+  /// No description provided for @createSessionPresetComedy.
+  ///
+  /// In pt, this message translates to:
+  /// **'Comédia com Amigos'**
+  String get createSessionPresetComedy;
+
+  /// No description provided for @howItWorksTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Como funciona a sessão'**
+  String get howItWorksTitle;
+
+  /// No description provided for @howItWorksStep1Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Gera o Código QR'**
+  String get howItWorksStep1Title;
+
+  /// No description provided for @howItWorksStep1Desc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apresenta o código no ecrã seguinte para os amigos entrarem.'**
+  String get howItWorksStep1Desc;
+
+  /// No description provided for @howItWorksStep2Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Rede Local Bluetooth'**
+  String get howItWorksStep2Title;
+
+  /// No description provided for @howItWorksStep2Desc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conexão direta sem necessidade de internet ou servidores.'**
+  String get howItWorksStep2Desc;
+
+  /// No description provided for @howItWorksStep3Title.
+  ///
+  /// In pt, this message translates to:
+  /// **'Votação e Consenso'**
+  String get howItWorksStep3Title;
+
+  /// No description provided for @howItWorksStep3Desc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos votam nos seus telemóveis e o vencedor é apurado.'**
+  String get howItWorksStep3Desc;
+
+  /// No description provided for @howItWorksHostBadge.
+  ///
+  /// In pt, this message translates to:
+  /// **'O teu telemóvel será o anfitrião da rede local'**
+  String get howItWorksHostBadge;
 
   /// No description provided for @createSessionLabel.
   ///
@@ -203,7 +275,7 @@ abstract class AppLocalizations {
   /// No description provided for @createSessionHint.
   ///
   /// In pt, this message translates to:
-  /// **'Ex.: Friday Movie Night'**
+  /// **'Ex.: Sexta de Cinema'**
   String get createSessionHint;
 
   /// No description provided for @createSessionButton.
@@ -551,7 +623,7 @@ abstract class AppLocalizations {
   /// No description provided for @resultsWinner.
   ///
   /// In pt, this message translates to:
-  /// **'Vencedor 🏆'**
+  /// **'Vencedor'**
   String get resultsWinner;
 
   /// No description provided for @resultsLikes.

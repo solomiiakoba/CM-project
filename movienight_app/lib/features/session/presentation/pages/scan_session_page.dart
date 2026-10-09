@@ -9,6 +9,7 @@ import 'package:movienight_app/features/session/presentation/widgets/scanner_cor
 import 'package:movienight_app/features/session/presentation/widgets/scanner_instruction_badge.dart';
 import 'package:movienight_app/features/session/presentation/widgets/scanner_overlay.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
+import 'package:movienight_app/shared/widgets/glass_back_button.dart';
 
 /// Ecrã de leitura ótica (câmara) do código QR de convite para a sessão MovieNight.
 class ScanSessionPage extends StatefulWidget {
@@ -85,16 +86,16 @@ class _ScanSessionPageState extends State<ScanSessionPage>
           // ── AppBar transparente ───────────────────────────────────────
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios_rounded,
-                      color: Colors.white,
-                    ),
+                  GlassBackButton(
+                    iconColor: Colors.white,
+                    backgroundColor: Colors.black.withValues(alpha: 0.5),
+                    borderColor: Colors.white24,
                     onPressed: () => Navigator.pop(context),
                   ),
+                  const SizedBox(width: 14),
                   Text(
                     l10n.scanSessionTitle,
                     style: const TextStyle(

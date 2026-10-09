@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:movienight_app/app/theme.dart';
 import 'package:movienight_app/features/session/domain/entities/session.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
+import 'package:movienight_app/shared/widgets/glass_container.dart';
 
 /// Card que lista os membros conetados à sessão em tempo real, distinguindo o organizador dos pares.
 class ParticipantsCard extends StatelessWidget {
@@ -19,14 +20,10 @@ class ParticipantsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cs.outlineVariant),
-      ),
       child: Column(
         children: [
           // Cabeçalho da secção com contador
@@ -69,7 +66,12 @@ class ParticipantsCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-          Divider(color: cs.outlineVariant, height: 1),
+          Divider(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : cs.outlineVariant.withValues(alpha: 0.5),
+            height: 1,
+          ),
           const SizedBox(height: 16),
 
           // Organizador

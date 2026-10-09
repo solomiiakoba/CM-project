@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:movienight_app/app/theme.dart';
 import 'package:movienight_app/features/session/presentation/providers/session_controller.dart';
-import 'package:movienight_app/features/session/presentation/widgets/session_hero_header.dart';
+import 'package:movienight_app/features/session/presentation/widgets/session_how_it_works_card.dart';
+import 'package:movienight_app/features/session/presentation/widgets/session_name_presets_row.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
+import 'package:movienight_app/shared/widgets/glass_back_button.dart';
 import 'package:movienight_app/shared/widgets/gradient_action_button.dart';
 import 'package:movienight_app/shared/widgets/particle_background.dart';
 
@@ -26,6 +28,15 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  void _onSelectPreset(String preset) {
+    setState(() {
+      _nameController.text = preset;
+      _nameController.selection = TextSelection.fromPosition(
+        TextPosition(offset: preset.length),
+      );
+    });
   }
 
   Future<void> _createSession() async {
@@ -63,6 +74,13 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final presets = [
+      l10n.createSessionPresetFriday,
+      l10n.createSessionPresetHorror,
+      l10n.createSessionPresetSciFi,
+      l10n.createSessionPresetComedy,
+    ];
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: true,
@@ -71,97 +89,130 @@ class _CreateSessionPageState extends ConsumerState<CreateSessionPage> {
         child: SafeArea(
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top -
-                    MediaQuery.of(context).padding.bottom,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Top Navigation Bar ──────────────────────────────
+                Row(
                   children: [
-                    // ── Back button ─────────────────────────────────────────
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      alignment: Alignment.centerLeft,
-                      icon: Icon(
-                        Icons.arrow_back_ios_rounded,
-                        color: cs.onSurface,
-                      ),
+                    GlassBackButton(
                       onPressed: () => Navigator.pop(context),
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // ── Hero Header ─────────────────────────────────────────
-                    SessionHeroHeader(
-                      icon: Icons.add_circle_outline_rounded,
-                      title: l10n.createSessionSubtitle,
-                      subtitle: l10n.createSessionDesc,
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // ── Session Name Field ──────────────────────────────────
+                    const SizedBox(width: 14),
                     Text(
-                      l10n.createSessionLabel,
+                      l10n.createSessionTitle,
                       style: TextStyle(
                         color: cs.onSurface,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _nameController,
-                      autofocus: true,
-                      style: TextStyle(
-                        color: cs.onSurface,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: l10n.createSessionHint,
-                        filled: true,
-                        fillColor: isDark ? MNColors.surfaceVar : Colors.white,
-                        prefixIcon: const Icon(
-                          Icons.movie_filter_rounded,
-                          color: MNColors.primaryLight,
-                          size: 20,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark ? MNColors.outlineVar : const Color(0xFFCBD5E1),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: MNColors.primary,
-                            width: 2,
-                          ),
-                        ),
-                      ),
-                      onSubmitted: (_) => _createSession(),
-                    ),
-
-                    const Spacer(),
-                    const SizedBox(height: 32),
-
-                    // ── Create Action Button ────────────────────────────────
-                    GradientActionButton(
-                      label: l10n.createSessionButton,
-                      icon: Icons.rocket_launch_rounded,
-                      isLoading: _loading,
-                      onTap: _createSession,
-                      padding: const EdgeInsets.only(bottom: 32),
                     ),
                   ],
                 ),
-              ),
+
+                const SizedBox(height: 24),
+
+                // ── Título Cinematográfico Limpo ────────────────────
+                ShaderMask(
+                  shaderCallback: (b) => LinearGradient(
+                    colors: isDark
+                        ? const [MNColors.primaryLight, MNColors.secondary]
+                        : const [Color(0xFF6D28D9), Color(0xFF0284C7)],
+                  ).createShader(b),
+                  child: Text(
+                    l10n.createSessionSubtitle,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.4,
+                      height: 1.15,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  l10n.createSessionDesc,
+                  style: TextStyle(
+                    color: cs.onSurfaceVariant,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    height: 1.3,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // ── Campo: Nome da Sessão ───────────────────────────
+                Text(
+                  l10n.createSessionLabel,
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _nameController,
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: l10n.createSessionHint,
+                    filled: true,
+                    fillColor: isDark
+                        ? const Color(0xFF141724).withValues(alpha: 0.8)
+                        : cs.surfaceContainerHighest.withValues(alpha: 0.55),
+                    prefixIcon: Icon(
+                      Icons.movie_filter_rounded,
+                      color: isDark ? MNColors.primaryLight : MNColors.primary,
+                      size: 20,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDark ? Colors.white12 : cs.outlineVariant,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                        color: isDark ? MNColors.primary : MNColors.primaryDark,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  onSubmitted: (_) => _createSession(),
+                ),
+
+                const SizedBox(height: 12),
+
+                // ── Atalhos Rápidos para Nome ───────────────────────
+                SessionNamePresetsRow(
+                  presets: presets,
+                  onSelectPreset: _onSelectPreset,
+                ),
+
+                const SizedBox(height: 24),
+
+                // ── Card Informativo "Como Funciona" ────────────────
+                const SessionHowItWorksCard(),
+
+                const SizedBox(height: 28),
+
+                // ── Botão Primário: Criar Sessão ────────────────────
+                GradientActionButton(
+                  label: l10n.createSessionButton,
+                  icon: Icons.rocket_launch_rounded,
+                  isLoading: _loading,
+                  onTap: _createSession,
+                  padding: const EdgeInsets.only(bottom: 24),
+                ),
+              ],
             ),
           ),
         ),

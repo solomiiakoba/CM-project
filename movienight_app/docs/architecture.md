@@ -115,7 +115,8 @@ flowchart TD
 - **Pages (`presentation/pages/`):** Modular compositions (`HomePage`, `MoviesListPage`, `MovieFiltersPage`, `CreateSessionPage`, `ScanSessionPage`, `SessionLobbyPage`, `SettingsPage`, `VotingPage`, `ResultsPage`, `ArWinnerPage`).
 - **Providers (`presentation/providers/`):** Riverpod state notifiers (`homeFeedProvider`, `homeActionsProvider`, `moviesProvider`, `movieFiltersProvider`, `sessionLobbyNotifierProvider`, `appSettingsProvider`, `themeProvider`, `localeProvider`, `votingProvider`, `votingProviders`, `arCapabilityServiceProvider`, `arSupportedProvider`).
 - **Services (`presentation/services/`):** Hardware sensor and gesture controllers (`TiltSensorService`, `ArSpatialMotionService`).
-- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic (including Home feed widgets: `HomeSpotlightParallaxCard`, `HomePartyHubCard`, `HomeTrendingSection`, `HomeLogoHeader`; and AR presentation widgets: `ArCameraViewfinder`, `ArPlaneReticle`, `ArTrophyPedestalCard`, `ArTrophyHudOverlay`).
+- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic (including Home feed widgets: `HomeSpotlightParallaxCard`, `HomePartyHubCard`, `HomeTrendingSection`, `HomeLogoHeader`; Session widgets: `SessionHowItWorksCard`, `SessionNamePresetsRow`; and AR presentation widgets: `ArCameraViewfinder`, `ArPlaneReticle`, `ArTrophyPedestalCard`, `ArTrophyHudOverlay`).
+- **Shared Widgets (`shared/widgets/`):** Universal cross-feature design system components (`GlassContainer`, `GlassBackButton`, `GlassNavBar`, `GradientActionButton`, `ParticleBackground`) providing consistent glassmorphic styling, high contrast across themes, and uniform navigation controls.
 
 ---
 

@@ -52,10 +52,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createSessionTitle => 'New session';
 
   @override
-  String get createSessionSubtitle => 'Let\'s start a Movie Night 🍿';
+  String get createSessionSubtitle => 'Set up your Movie Night';
 
   @override
-  String get createSessionDesc => 'Set some information for the session.';
+  String get createSessionDesc =>
+      'Customize the session before inviting your group.';
+
+  @override
+  String get createSessionPresetFriday => 'Friday Movie Night';
+
+  @override
+  String get createSessionPresetHorror => 'Horror Night';
+
+  @override
+  String get createSessionPresetSciFi => 'Sci-Fi Marathon';
+
+  @override
+  String get createSessionPresetComedy => 'Comedy with Friends';
+
+  @override
+  String get howItWorksTitle => 'How it works';
+
+  @override
+  String get howItWorksStep1Title => 'Generate QR Code';
+
+  @override
+  String get howItWorksStep1Desc =>
+      'Display the code on the next screen for friends to join.';
+
+  @override
+  String get howItWorksStep2Title => 'Local Bluetooth Mesh';
+
+  @override
+  String get howItWorksStep2Desc =>
+      'Direct peer connection without internet or central servers.';
+
+  @override
+  String get howItWorksStep3Title => 'Voting and Consensus';
+
+  @override
+  String get howItWorksStep3Desc =>
+      'Everyone votes on their phones to find the winning movie.';
+
+  @override
+  String get howItWorksHostBadge =>
+      'Your phone will act as the local network host';
 
   @override
   String get createSessionLabel => 'Session Name';
@@ -250,7 +291,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resultsSubtitle => 'Here are tonight\'s top picks!';
 
   @override
-  String get resultsWinner => 'Winner 🏆';
+  String get resultsWinner => 'Winner';
 
   @override
   String resultsLikes(int count) {

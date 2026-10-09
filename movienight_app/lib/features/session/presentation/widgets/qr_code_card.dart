@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:movienight_app/app/theme.dart';
+import 'package:movienight_app/shared/widgets/glass_container.dart';
 
-/// Card que renderiza o QR Code ótico num contentor de alto contraste e o código da sessão formatado.
+/// Card que renderiza o QR Code ótico num contentor glassmorphic e o código da sessão formatado.
 class QrCodeCard extends StatelessWidget {
   final String qrData;
   final String sessionId;
@@ -20,20 +21,8 @@ class QrCodeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cs.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            color: MNColors.primary.withValues(alpha: 0.12),
-            blurRadius: 30,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
       child: Column(
         children: [
           // QR sempre em fundo branco para contraste garantido na leitura ótica

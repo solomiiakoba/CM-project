@@ -8,6 +8,7 @@ import '../../../../app/theme.dart';
 import '../../../../core/bluetooth/movie_night_ble_client.dart';
 import '../../../../core/bluetooth/movie_night_peripheral_service.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/widgets/glass_container.dart';
 import '../../../../shared/widgets/particle_background.dart';
 import '../../../movies/domain/entities/movie.dart';
 import '../../domain/entities/vote.dart';
@@ -185,14 +186,9 @@ class _ResultsPageState extends State<ResultsPage> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).popUntil((route) => route.isFirst),
-                  child: Container(
-                    width: double.infinity,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: cs.outlineVariant),
-                    ),
+                  child: GlassContainer(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    borderRadius: 16,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

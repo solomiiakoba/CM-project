@@ -52,16 +52,57 @@ class AppLocalizationsPt extends AppLocalizations {
   String get createSessionTitle => 'Nova sessão';
 
   @override
-  String get createSessionSubtitle => 'Vamos começar uma Movie Night 🍿';
+  String get createSessionSubtitle => 'Configura a tua Movie Night';
 
   @override
-  String get createSessionDesc => 'Define algumas informações para a sessão.';
+  String get createSessionDesc =>
+      'Personaliza a sessão antes de convidar o teu grupo.';
+
+  @override
+  String get createSessionPresetFriday => 'Sexta de Cinema';
+
+  @override
+  String get createSessionPresetHorror => 'Noite de Terror';
+
+  @override
+  String get createSessionPresetSciFi => 'Maratona Sci-Fi';
+
+  @override
+  String get createSessionPresetComedy => 'Comédia com Amigos';
+
+  @override
+  String get howItWorksTitle => 'Como funciona a sessão';
+
+  @override
+  String get howItWorksStep1Title => 'Gera o Código QR';
+
+  @override
+  String get howItWorksStep1Desc =>
+      'Apresenta o código no ecrã seguinte para os amigos entrarem.';
+
+  @override
+  String get howItWorksStep2Title => 'Rede Local Bluetooth';
+
+  @override
+  String get howItWorksStep2Desc =>
+      'Conexão direta sem necessidade de internet ou servidores.';
+
+  @override
+  String get howItWorksStep3Title => 'Votação e Consenso';
+
+  @override
+  String get howItWorksStep3Desc =>
+      'Todos votam nos seus telemóveis e o vencedor é apurado.';
+
+  @override
+  String get howItWorksHostBadge =>
+      'O teu telemóvel será o anfitrião da rede local';
 
   @override
   String get createSessionLabel => 'Nome da sessão';
 
   @override
-  String get createSessionHint => 'Ex.: Friday Movie Night';
+  String get createSessionHint => 'Ex.: Sexta de Cinema';
 
   @override
   String get createSessionButton => 'Criar sessão';
@@ -251,7 +292,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get resultsSubtitle => 'Os favoritos desta noite!';
 
   @override
-  String get resultsWinner => 'Vencedor 🏆';
+  String get resultsWinner => 'Vencedor';
 
   @override
   String resultsLikes(int count) {

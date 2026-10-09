@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../movies/domain/entities/movie.dart';
+import '../../../../shared/widgets/glass_container.dart';
 
 class ResultsRankingRow extends StatelessWidget {
   final int position;
@@ -22,13 +23,9 @@ class ResultsRankingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outlineVariant),
-      ),
+    return GlassContainer(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      borderRadius: 16,
       child: Row(
         children: [
           SizedBox(

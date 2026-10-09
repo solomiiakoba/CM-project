@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:movienight_app/shared/widgets/glass_back_button.dart';
+
 /// Barra de ferramentas e HUD para controlo da experiência de Realidade Aumentada.
 class ArTrophyHudOverlay extends StatelessWidget {
   final bool isAnchored;
@@ -38,21 +40,12 @@ class ArTrophyHudOverlay extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
+                  GlassBackButton(
                     onPressed: onBack,
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white24),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
+                    iconColor: Colors.white,
+                    backgroundColor: Colors.black.withValues(alpha: 0.6),
+                    borderColor: Colors.white24,
+                    iconSize: 18,
                   ),
 
                   // Status Chip

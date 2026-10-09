@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:movienight_app/shared/widgets/glass_back_button.dart';
+import 'package:movienight_app/shared/widgets/glass_container.dart';
+
 class VotingHeader extends StatelessWidget {
   final String title;
   final int current;
@@ -22,8 +25,8 @@ class VotingHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
-          IconButton(
-            icon: Icon(Icons.close_rounded, color: cs.onSurface),
+          GlassBackButton(
+            icon: Icons.close_rounded,
             onPressed: onClose,
           ),
           Expanded(
@@ -37,18 +40,14 @@ class VotingHeader extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: cs.outlineVariant),
-            ),
+          GlassContainer(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            borderRadius: 20,
             child: Text(
               '$current / $total',
               style: TextStyle(
                 color: cs.primary,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 fontSize: 13,
               ),
             ),

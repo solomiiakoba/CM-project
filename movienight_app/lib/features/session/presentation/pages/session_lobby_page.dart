@@ -11,6 +11,7 @@ import 'package:movienight_app/features/session/presentation/widgets/bluetooth_s
 import 'package:movienight_app/features/session/presentation/widgets/participants_card.dart';
 import 'package:movienight_app/features/session/presentation/widgets/qr_code_card.dart';
 import 'package:movienight_app/l10n/app_localizations.dart';
+import 'package:movienight_app/shared/widgets/glass_back_button.dart';
 import 'package:movienight_app/shared/widgets/gradient_action_button.dart';
 import 'package:movienight_app/shared/widgets/particle_background.dart';
 
@@ -91,9 +92,10 @@ class _SessionLobbyPageState extends ConsumerState<SessionLobbyPage>
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_rounded, color: cs.onSurface),
-                  onPressed: () => Navigator.pop(context),
+                leading: Center(
+                  child: GlassBackButton(
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ),
 

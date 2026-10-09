@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:movienight_app/app/theme.dart';
+import 'package:movienight_app/shared/widgets/glass_container.dart';
 
 /// Card visual que indica o estado da difusão Bluetooth BLE através de um ícone com animação pulsante.
 class BluetoothStatusCard extends StatelessWidget {
@@ -17,17 +18,13 @@ class BluetoothStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final activeColor =
         advertising ? MNColors.secondary : const Color(0xFFF59E0B);
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: activeColor.withValues(alpha: 0.4)),
-      ),
+      borderRadius: 16,
+      borderColor: activeColor.withValues(alpha: 0.4),
       child: Row(
         children: [
           AnimatedBuilder(
