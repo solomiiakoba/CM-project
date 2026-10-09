@@ -68,6 +68,7 @@ flowchart TD
   - `VotingSession`: Aggregate root computing movie ranking and like tallies.
   - `ArTrophyConfig`: Models 3D holographic AR trophy presentation and statistics.
   - `HomeQuickAction`: Models primary navigation actions on the landing view.
+  - `HomeFeed`: Models aggregated home spotlight movie and trending catalog.
 - **Exceptions (`domain/exceptions/`):**
   - `MovieException`, `TmdbApiException`, `TmdbApiKeyException`, `MovieNetworkException`.
   - `SessionException`, `SessionNotFoundException`, `InvalidSessionPayloadException`, `SessionConnectionException`.
@@ -84,7 +85,7 @@ flowchart TD
   - `GetSettingsUseCase`, `UpdateThemeUseCase`, `UpdateLocaleUseCase`.
   - `SaveVotingSessionUseCase`, `GetVotingSessionUseCase`, `CastVoteUseCase`, `ClearVotingSessionUseCase`.
   - `GetArTrophyConfigUseCase`.
-  - `GetHomeActionsUseCase`.
+  - `GetHomeActionsUseCase`, `GetHomeFeedUseCase`.
 
 ### 2.3 Data Layer
 - **Data Sources (`data/datasources/`):**
@@ -112,9 +113,9 @@ flowchart TD
 
 ### 2.4 Presentation Layer
 - **Pages (`presentation/pages/`):** Modular compositions (`HomePage`, `MoviesListPage`, `MovieFiltersPage`, `CreateSessionPage`, `ScanSessionPage`, `SessionLobbyPage`, `SettingsPage`, `VotingPage`, `ResultsPage`, `ArWinnerPage`).
-- **Providers (`presentation/providers/`):** Riverpod state notifiers (`homeActionsProvider`, `moviesProvider`, `movieFiltersProvider`, `sessionLobbyNotifierProvider`, `appSettingsProvider`, `themeProvider`, `localeProvider`, `votingProvider`, `votingProviders`, `arCapabilityServiceProvider`, `arSupportedProvider`).
+- **Providers (`presentation/providers/`):** Riverpod state notifiers (`homeFeedProvider`, `homeActionsProvider`, `moviesProvider`, `movieFiltersProvider`, `sessionLobbyNotifierProvider`, `appSettingsProvider`, `themeProvider`, `localeProvider`, `votingProvider`, `votingProviders`, `arCapabilityServiceProvider`, `arSupportedProvider`).
 - **Services (`presentation/services/`):** Hardware sensor and gesture controllers (`TiltSensorService`, `ArSpatialMotionService`).
-- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic (including AR presentation widgets: `ArCameraViewfinder`, `ArPlaneReticle`, `ArTrophyPedestalCard`, `ArTrophyHudOverlay`).
+- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic (including Home feed widgets: `HomeSpotlightParallaxCard`, `HomePartyHubCard`, `HomeTrendingSection`, `HomeLogoHeader`; and AR presentation widgets: `ArCameraViewfinder`, `ArPlaneReticle`, `ArTrophyPedestalCard`, `ArTrophyHudOverlay`).
 
 ---
 

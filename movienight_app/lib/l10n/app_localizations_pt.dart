@@ -10,7 +10,7 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get appTitle => 'MovieNight 🎬';
+  String get appTitle => 'MovieNight';
 
   @override
   String get appDescription => 'Escolhe um filme com os teus amigos.';

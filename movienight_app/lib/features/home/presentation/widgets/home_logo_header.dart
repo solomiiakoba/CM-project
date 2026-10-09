@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme.dart';
 
+/// Cabeçalho minimalista da Home Screen com tipografia cinematográfica e gradiente dinâmico.
 class HomeLogoHeader extends StatelessWidget {
   final String title;
   final String description;
@@ -14,37 +15,17 @@ class HomeLogoHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 68,
-          height: 68,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [MNColors.primary, MNColors.secondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: MNColors.primary.withValues(alpha: 0.5),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.movie_filter_rounded,
-            color: Colors.white,
-            size: 36,
-          ),
-        ),
-        const SizedBox(height: 28),
         ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [MNColors.primaryLight, MNColors.secondary],
+          shaderCallback: (bounds) => LinearGradient(
+            colors: isDark
+                ? const [MNColors.primaryLight, MNColors.secondary]
+                : const [Color(0xFF6D28D9), Color(0xFF0284C7)],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ).createShader(bounds),
@@ -52,20 +33,21 @@ class HomeLogoHeader extends StatelessWidget {
             title,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 40,
+              fontSize: 32,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
               height: 1.1,
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6),
         Text(
           description,
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontSize: 15,
-            height: 1.5,
+            color: cs.onSurfaceVariant,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            height: 1.3,
           ),
         ),
       ],
