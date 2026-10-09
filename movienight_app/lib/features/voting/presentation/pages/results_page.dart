@@ -12,6 +12,8 @@ import '../../../../shared/widgets/particle_background.dart';
 import '../../../movies/domain/entities/movie.dart';
 import '../../domain/entities/vote.dart';
 import '../../domain/entities/voting_session.dart';
+import '../../domain/usecases/get_ar_trophy_config_usecase.dart';
+import 'ar_winner_page.dart';
 import '../widgets/results_empty_view.dart';
 import '../widgets/results_ranking_row.dart';
 import '../widgets/results_winner_banner.dart';
@@ -147,6 +149,26 @@ class _ResultsPageState extends State<ResultsPage> {
                               likes: likes,
                               winnerLabel: l10n.resultsWinner,
                               likesFormatted: l10n.resultsLikes(likes),
+                              onLaunchAr: () {
+                                final totalParticipants = _votingSession.votes
+                                    .map((v) => v.participantId)
+                                    .toSet()
+                                    .length;
+                                const useCase = GetArTrophyConfigUseCase();
+                                final config = useCase.execute(
+                                  winnerMovie: movie,
+                                  affirmativeVotes: likes,
+                                  totalParticipants: totalParticipants > 0
+                                      ? totalParticipants
+                                      : 1,
+                                );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ArWinnerPage(config: config),
+                                  ),
+                                );
+                              },
                             );
                           }
                           return ResultsRankingRow(

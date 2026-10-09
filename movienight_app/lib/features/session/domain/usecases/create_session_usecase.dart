@@ -8,10 +8,9 @@ class CreateSessionUseCase {
   final ParticipantIdentityService _identityService;
 
   CreateSessionUseCase({
-    required SessionRepository repository,
+    required this._repository,
     ParticipantIdentityService? identityService,
-  })  : _repository = repository,
-        _identityService = identityService ?? ParticipantIdentityService();
+  })  : _identityService = identityService ?? ParticipantIdentityService();
 
   Future<Session> execute({required String name}) async {
     final organizerId = await _identityService.getParticipantId();

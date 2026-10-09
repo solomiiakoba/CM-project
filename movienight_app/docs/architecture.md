@@ -66,6 +66,7 @@ flowchart TD
   - `AppSettings`: Models application-wide configuration (ThemeMode, Locale).
   - `Vote`: Models individual participant vote on a candidate movie.
   - `VotingSession`: Aggregate root computing movie ranking and like tallies.
+  - `ArTrophyConfig`: Models 3D holographic AR trophy presentation and statistics.
   - `HomeQuickAction`: Models primary navigation actions on the landing view.
 - **Exceptions (`domain/exceptions/`):**
   - `MovieException`, `TmdbApiException`, `TmdbApiKeyException`, `MovieNetworkException`.
@@ -77,10 +78,12 @@ flowchart TD
   - `SettingsRepository`: Abstract contract defining configuration retrieval and preferences storage.
   - `VotingRepository`: Abstract contract defining voting session persistence and vote registration.
   - `HomeRepository`: Abstract contract defining quick actions retrieval.
+  - `ArCapabilityService`: Abstract service contract defining device camera and AR availability verification.
 - **Use Cases (`domain/usecases/`):**
   - `CreateSessionUseCase`, `GetActiveSessionUseCase`, `ParseQrSessionUseCase`.
   - `GetSettingsUseCase`, `UpdateThemeUseCase`, `UpdateLocaleUseCase`.
   - `SaveVotingSessionUseCase`, `GetVotingSessionUseCase`, `CastVoteUseCase`, `ClearVotingSessionUseCase`.
+  - `GetArTrophyConfigUseCase`.
   - `GetHomeActionsUseCase`.
 
 ### 2.3 Data Layer
@@ -108,10 +111,10 @@ flowchart TD
   - `HomeRepositoryImpl`: Provides quick action domain models.
 
 ### 2.4 Presentation Layer
-- **Pages (`presentation/pages/`):** Modular compositions (`HomePage`, `MoviesListPage`, `MovieFiltersPage`, `CreateSessionPage`, `ScanSessionPage`, `SessionLobbyPage`, `SettingsPage`, `VotingPage`, `ResultsPage`).
-- **Providers (`presentation/providers/`):** Riverpod state notifiers (`homeActionsProvider`, `moviesProvider`, `movieFiltersProvider`, `sessionLobbyNotifierProvider`, `appSettingsProvider`, `themeProvider`, `localeProvider`, `votingProvider`, `votingProviders`).
-- **Services (`presentation/services/`):** Hardware sensor and gesture controllers (`TiltSensorService`).
-- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic.
+- **Pages (`presentation/pages/`):** Modular compositions (`HomePage`, `MoviesListPage`, `MovieFiltersPage`, `CreateSessionPage`, `ScanSessionPage`, `SessionLobbyPage`, `SettingsPage`, `VotingPage`, `ResultsPage`, `ArWinnerPage`).
+- **Providers (`presentation/providers/`):** Riverpod state notifiers (`homeActionsProvider`, `moviesProvider`, `movieFiltersProvider`, `sessionLobbyNotifierProvider`, `appSettingsProvider`, `themeProvider`, `localeProvider`, `votingProvider`, `votingProviders`, `arCapabilityServiceProvider`, `arSupportedProvider`).
+- **Services (`presentation/services/`):** Hardware sensor and gesture controllers (`TiltSensorService`, `ArSpatialMotionService`).
+- **Widgets (`presentation/widgets/`):** Atomic and section-level reusable visual components decoupled from state logic (including AR presentation widgets: `ArCameraViewfinder`, `ArPlaneReticle`, `ArTrophyPedestalCard`, `ArTrophyHudOverlay`).
 
 ---
 

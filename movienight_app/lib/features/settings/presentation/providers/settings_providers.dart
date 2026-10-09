@@ -50,13 +50,10 @@ class AppSettingsNotifier extends StateNotifier<AppSettings> {
   final UpdateLocaleUseCase _updateLocaleUseCase;
 
   AppSettingsNotifier({
-    required GetSettingsUseCase getSettingsUseCase,
-    required UpdateThemeUseCase updateThemeUseCase,
-    required UpdateLocaleUseCase updateLocaleUseCase,
-  })  : _getSettingsUseCase = getSettingsUseCase,
-        _updateThemeUseCase = updateThemeUseCase,
-        _updateLocaleUseCase = updateLocaleUseCase,
-        super(const AppSettings()) {
+    required this._getSettingsUseCase,
+    required this._updateThemeUseCase,
+    required this._updateLocaleUseCase,
+  })  : super(const AppSettings()) {
     _loadSettings();
   }
 

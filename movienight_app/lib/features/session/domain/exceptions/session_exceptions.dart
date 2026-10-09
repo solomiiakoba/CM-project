@@ -18,11 +18,11 @@ class SessionNotFoundException extends SessionException {
 /// Lançada quando os dados do QR code lido são inválidos ou corrompidos.
 class InvalidSessionQrException extends SessionException {
   const InvalidSessionQrException([
-    String message = 'O código QR lido não corresponde a uma sessão válida do MovieNight.',
-  ]) : super(message);
+    super.message = 'O código QR lido não corresponde a uma sessão válida do MovieNight.',
+  ]);
 }
 
 /// Lançada quando ocorre uma falha na persistência local da sessão.
 class SessionStorageException extends SessionException {
-  const SessionStorageException(String message) : super(message);
+  const SessionStorageException(super.message);
 }

@@ -8,6 +8,7 @@ class ResultsWinnerBanner extends StatelessWidget {
   final int likes;
   final String winnerLabel;
   final String likesFormatted;
+  final VoidCallback? onLaunchAr;
 
   const ResultsWinnerBanner({
     super.key,
@@ -15,6 +16,7 @@ class ResultsWinnerBanner extends StatelessWidget {
     required this.likes,
     required this.winnerLabel,
     required this.likesFormatted,
+    this.onLaunchAr,
   });
 
   @override
@@ -175,6 +177,53 @@ class ResultsWinnerBanner extends StatelessWidget {
                           );
                         }).toList(),
                       ),
+                      if (onLaunchAr != null) ...[
+                        const SizedBox(height: 12),
+                        InkWell(
+                          onTap: onLaunchAr,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFD4AF37), Color(0xFFFFDF73)],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFFD700)
+                                      .withValues(alpha: 0.35),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.view_in_ar_rounded,
+                                  size: 16,
+                                  color: Color(0xFF221A00),
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Ver Troféu em AR',
+                                  style: TextStyle(
+                                    color: Color(0xFF221A00),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
